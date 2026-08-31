@@ -1,0 +1,274 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-sans:
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-subtle: var(--subtle);
+  --shadow-card: var(--shadow-sm);
+  --shadow-float: var(--shadow-lg);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-subtle: var(--brand-subtle);
+}
+
+:root {
+  --radius: 1.125rem;
+  --background: oklch(0.959 0.01 81.8);
+  --foreground: oklch(0.249 0.005 67.6);
+  --card: oklch(0.994 0.006 84.6);
+  --card-foreground: oklch(0.249 0.005 67.6);
+  --popover: oklch(0.994 0.006 84.6);
+  --popover-foreground: oklch(0.249 0.005 67.6);
+  --primary: oklch(0.502 0.081 44.4);
+  --primary-foreground: oklch(0.994 0.006 84.6);
+  --secondary: oklch(0.931 0.015 77.1);
+  --secondary-foreground: oklch(0.249 0.005 67.6);
+  --muted: oklch(0.931 0.015 77.1);
+  --muted-foreground: oklch(0.531 0.013 71.8);
+  --accent: oklch(0.907 0.02 77.3);
+  --accent-foreground: oklch(0.249 0.005 67.6);
+  --destructive: oklch(0.527 0.12 28.3);
+  --destructive-foreground: oklch(0.994 0.006 84.6);
+  --success: oklch(0.55 0.078 130.6);
+  --success-foreground: oklch(0.994 0.006 84.6);
+  --warning: oklch(0.575 0.095 72.6);
+  --warning-foreground: oklch(0.994 0.006 84.6);
+  --surface-2: oklch(0.931 0.015 77.1);
+  --surface-3: oklch(0.907 0.02 77.3);
+  --subtle: oklch(0.697 0.016 70.8);
+  --border: oklch(0.877 0.018 73.1);
+  --input: oklch(0.877 0.018 73.1);
+  --ring: oklch(0.502 0.081 44.4);
+  --brand: oklch(0.502 0.081 44.4);
+  --brand-foreground: oklch(0.994 0.006 84.6);
+  --brand-subtle: oklch(0.931 0.026 61);
+  --shadow-sm: 0 7px 20px rgb(50 38 28 / 0.08);
+  --shadow-lg: 0 16px 38px rgb(50 38 28 / 0.1);
+  --chart-1: oklch(0.502 0.081 44.4);
+  --chart-2: oklch(0.533 0.099 49.5);
+  --chart-3: oklch(0.55 0.078 130.6);
+  --chart-4: oklch(0.575 0.095 72.6);
+  --chart-5: oklch(0.697 0.016 70.8);
+  --sidebar: oklch(0.994 0.006 84.6);
+  --sidebar-foreground: oklch(0.249 0.005 67.6);
+  --sidebar-primary: oklch(0.502 0.081 44.4);
+  --sidebar-primary-foreground: oklch(0.994 0.006 84.6);
+  --sidebar-accent: oklch(0.931 0.015 77.1);
+  --sidebar-accent-foreground: oklch(0.249 0.005 67.6);
+  --sidebar-border: oklch(0.877 0.018 73.1);
+  --sidebar-ring: oklch(0.502 0.081 44.4);
+}
+
+.dark {
+  --background: oklch(0.201 0.004 84.6);
+  --foreground: oklch(0.955 0.015 77.1);
+  --card: oklch(0.24 0.006 78.2);
+  --card-foreground: oklch(0.955 0.015 77.1);
+  --popover: oklch(0.24 0.006 78.2);
+  --popover-foreground: oklch(0.955 0.015 77.1);
+  --primary: oklch(0.63 0.095 45);
+  --primary-foreground: oklch(0.201 0.004 84.6);
+  --secondary: oklch(0.275 0.008 75.2);
+  --secondary-foreground: oklch(0.955 0.015 77.1);
+  --muted: oklch(0.275 0.008 75.2);
+  --muted-foreground: oklch(0.769 0.019 70.2);
+  --accent: oklch(0.308 0.01 73.5);
+  --accent-foreground: oklch(0.955 0.015 77.1);
+  --destructive: oklch(0.667 0.116 27.2);
+  --destructive-foreground: oklch(0.201 0.004 84.6);
+  --success: oklch(0.693 0.084 126.1);
+  --success-foreground: oklch(0.201 0.004 84.6);
+  --warning: oklch(0.719 0.098 74.3);
+  --warning-foreground: oklch(0.201 0.004 84.6);
+  --surface-2: oklch(0.275 0.008 75.2);
+  --surface-3: oklch(0.308 0.01 73.5);
+  --subtle: oklch(0.616 0.018 64.5);
+  --border: oklch(0.336 0.011 67.4);
+  --input: oklch(0.336 0.011 67.4);
+  --ring: oklch(0.63 0.095 45);
+  --brand: oklch(0.63 0.095 45);
+  --brand-foreground: oklch(0.201 0.004 84.6);
+  --brand-subtle: oklch(0.32 0.035 48);
+  --shadow-sm: 0 8px 24px rgb(0 0 0 / 0.24);
+  --shadow-lg: 0 18px 44px rgb(0 0 0 / 0.34);
+  --chart-1: oklch(0.63 0.095 45);
+  --chart-2: oklch(0.68 0.1 55);
+  --chart-3: oklch(0.693 0.084 126.1);
+  --chart-4: oklch(0.719 0.098 74.3);
+  --chart-5: oklch(0.616 0.018 64.5);
+  --sidebar: oklch(0.24 0.006 78.2);
+  --sidebar-foreground: oklch(0.955 0.015 77.1);
+  --sidebar-primary: oklch(0.63 0.095 45);
+  --sidebar-primary-foreground: oklch(0.201 0.004 84.6);
+  --sidebar-accent: oklch(0.275 0.008 75.2);
+  --sidebar-accent-foreground: oklch(0.955 0.015 77.1);
+  --sidebar-border: oklch(0.336 0.011 67.4);
+  --sidebar-ring: oklch(0.63 0.095 45);
+}
+
+/* Mobile device stage — every app surface lives inside a 430px phone frame,
+   matching the Hap prototype. */
+@utility app-stage {
+  display: flex;
+  justify-content: center;
+  height: 100dvh;
+  background: oklch(0.878 0.004 84.6);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@utility phone-app {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+@utility phone-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+html:is(.dark) .app-stage {
+  background: oklch(0.145 0.003 84.6);
+}
+
+@media (min-width: 700px) {
+  .app-stage {
+    padding: 22px 0;
+  }
+  .phone-app {
+    border-radius: 28px;
+    border: 1px solid rgb(0 0 0 / 0.08);
+    box-shadow: 0 28px 80px rgb(0 0 0 / 0.22);
+  }
+}
+
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+/* ---- Popups stay inside the phone canvas ---- */
+[data-sonner-toaster] {
+  --width: 358px;
+  --offset: 72px;
+  font-family: inherit;
+}
+[data-sonner-toaster][data-y-position="top"] {
+  top: var(--offset);
+}
+[data-sonner-toast] {
+  border-radius: var(--radius-lg, 16px);
+}
+
+/* Radix dialogs/sheets should never be wider than the phone */
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"] {
+  width: calc(100% - 2rem);
+  max-width: 366px;
+  border-radius: 20px;
+}
+
+/* Full-height sheet pinned to the phone column */
+@utility phone-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 430px;
+}
