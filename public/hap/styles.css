@@ -734,6 +734,8 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 
 /* --- five promotion compositions --- */
 .menu-product.is-promoted{margin-top:16px;overflow:visible}
+/* floating labels (framed/filled) get guaranteed clearance above the name */
+.promo-style-framed,.promo-style-filled{padding-top:20px}
 /* 1 · framed */
 .promo-style-framed{border-color:color-mix(in srgb,var(--menu-brand) 70%,var(--menu-line))}
 .promo-style-framed .promo-notch{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:4;background:var(--menu-surface);padding:1px 8px 2px;color:var(--menu-brand);font-size:8.5px;line-height:1.35;font-weight:900;text-transform:uppercase;letter-spacing:.09em;white-space:nowrap;border-radius:5px}
