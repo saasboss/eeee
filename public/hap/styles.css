@@ -744,21 +744,22 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .promo-style-filled .product-price-main{font-size:19px}
 .promo-style-filled .badge-pill{color:#fff;background:rgba(255,255,255,.18)}
 .promo-style-filled .promo-inline-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:4;background:var(--menu-brand);color:#fff;padding:2px 8px;font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;border-radius:5px;box-shadow:0 0 0 2px var(--menu-bg)}
-/* 3 · offer strip */
+/* 3 · offer strip — the label is an in-flow header band, so it can never
+     overlap the dish name and it survives overflow:hidden on the card. */
 .promo-style-offer{border-color:color-mix(in srgb,var(--menu-brand) 45%,var(--menu-line));padding-bottom:0}
-.promo-style-offer .promo-strip-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:4;background:var(--menu-surface);color:var(--menu-brand);padding:1px 8px 2px;font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;border-radius:5px}
+.promo-style-offer .promo-strip-label{grid-column:1/-1;display:block;width:calc(100% + var(--card-pad,10px) * 2);margin:calc(var(--card-pad,10px) * -1) calc(var(--card-pad,10px) * -1) 2px;padding:6px 12px 5px;text-align:center;background:color-mix(in srgb,var(--menu-brand) 10%,transparent);color:var(--menu-brand);font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;border:0;border-bottom:1px solid color-mix(in srgb,var(--menu-brand) 25%,var(--menu-line));border-radius:0}
 .promo-style-offer .promo-offer-strip{grid-column:1/-1;margin:10px -10px 0;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:color-mix(in srgb,var(--menu-brand) 9%,transparent);border-top:1px solid color-mix(in srgb,var(--menu-brand) 25%,var(--menu-line));border-radius:0 0 15px 15px}
 .promo-offer-strip .offer-terms{min-width:0;font-size:9.5px;font-weight:750;color:var(--menu-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .promo-offer-strip .offer-price{flex:none;display:flex;align-items:baseline;gap:7px;font-family:var(--font-serif)}
 .promo-offer-strip .offer-price s{font-family:var(--font-sans);font-size:10px;font-weight:750;color:var(--menu-muted)}
 .promo-offer-strip .offer-price strong{font-size:17px;color:var(--menu-brand)}
-/* 4 · ribbon */
+/* 4 · ribbon — corner box is large enough that the rotated label is fully
+     visible, and the price column clears the ribbon's diagonal. */
 .promo-style-ribbon{overflow:hidden;border-color:color-mix(in srgb,var(--menu-brand) 45%,var(--menu-line))}
 .promo-style-ribbon .promo-ribbon{position:absolute;top:0;right:0;width:112px;height:112px;overflow:hidden;pointer-events:none;z-index:4}
-.promo-style-ribbon .promo-ribbon{width:86px;height:86px}
-.promo-style-ribbon .promo-ribbon span{top:12px;right:-34px;width:112px}
+.promo-style-ribbon .promo-ribbon span{position:absolute;top:25px;right:-38px;transform:rotate(45deg);width:150px;text-align:center;background:var(--menu-brand);color:#fff;font-size:8px;line-height:1.35;font-weight:900;letter-spacing:.09em;text-transform:uppercase;padding:4px 0;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 .promo-style-ribbon .product-price{align-self:end;margin-top:0;padding-bottom:2px}
-.promo-style-ribbon .promo-ribbon span{position:absolute;top:16px;right:-32px;transform:rotate(45deg);width:132px;text-align:center;background:var(--menu-brand);color:#fff;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;padding:3px 0;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.promo-style-ribbon .product-copy h3{padding-right:22px}
 /* 5 · editorial */
 .promo-style-editorial{grid-template-columns:1fr!important;gap:0;padding:0;overflow:hidden;border-color:color-mix(in srgb,var(--menu-brand) 40%,var(--menu-line))}
 .promo-style-editorial .product-img{width:100%;height:150px;border-radius:0}
