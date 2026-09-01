@@ -861,9 +861,8 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .tpl-live-page .product-list{padding:2px 14px 16px}
 
 /* ---- Promotion labels: outer border matching the card border, on every template ---- */
-.promo-notch,.promo-strip-label,.promo-inline-label{border:1px solid var(--menu-line)}
+.promo-notch,.promo-inline-label{border:1px solid var(--menu-line)}
 .promo-style-framed .promo-notch{border-color:color-mix(in srgb,var(--menu-brand) 70%,var(--menu-line))}
-.promo-style-offer .promo-strip-label{border-color:color-mix(in srgb,var(--menu-brand) 45%,var(--menu-line))}
 .promo-style-filled .promo-inline-label{border-color:var(--menu-brand)}
 .menu-product.promo-attention .promo-notch,
 .menu-product.promo-attention .promo-strip-label{border-color:var(--menu-brand)}
@@ -897,8 +896,7 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .template-modern .menu-product{--card-pad:11px}
 .template-grid .menu-product{--card-pad:8px}
 .template-editorial .menu-product,.template-noir .menu-product{--card-pad:0px}
-.menu-product.promo-style-offer{padding-bottom:0;overflow:hidden}
-.menu-product.promo-style-offer .promo-strip-label{top:6px}
+.menu-product.promo-style-offer{padding-bottom:0;overflow:hidden;margin-top:6px}
 .promo-style-offer .promo-offer-strip{grid-column:1/-1;width:calc(100% + var(--card-pad) * 2);margin:10px calc(var(--card-pad) * -1) 0;border-radius:0;border-bottom:0}
 .template-grid .menu-product.promo-style-offer{padding-bottom:0}
 
