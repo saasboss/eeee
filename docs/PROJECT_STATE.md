@@ -10,16 +10,7 @@ Last updated: 2026-09-03
 
 ## Now — one current priority
 
-Define and approve the MVP in plain language before expanding implementation.
-
-A planning agent should produce:
-
-- Target user
-- Painful problem
-- Smallest complete workflow
-- What is explicitly outside the MVP
-- Five to ten acceptance criteria
-- Success metric
+Phase 1 — UI/UX, information architecture, action hierarchy and visual polish of the existing Hap prototype. Mobile-first at 320/390/430px; ≥700px checked only for no regression. Visual work covers positioning, alignment, hierarchy, density, spacing on an 8px scale, one page-header structure, and removal of wasted space and redundant containers—without a global CSS rewrite. No changes to authentication, data, payments, dependencies or business logic. Delivered as the numbered tasks in `.lovable/plan.md`, one branch and pull request each, independently reviewable and revertible.
 
 ## Next — ordered queue
 
@@ -29,6 +20,8 @@ A planning agent should produce:
 4. Add automated checks around the first business-critical workflow.
 
 ## Later / deferred
+
+True desktop/tablet administration layout — deferred to Phase 2. Phase 1 only verifies that the existing framed presentation does not regress at ≥700px.
 
 No product features have been formally deferred yet. Add each deferred item here with:
 
