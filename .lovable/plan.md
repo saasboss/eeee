@@ -1,105 +1,92 @@
-# Phase 1 — UI/UX, IA and action-hierarchy audit
+# Phase 1 — UI/UX, IA and action hierarchy (revised after independent review)
 
-Scope: presentation, layout, navigation and action structure only. No business logic, data, auth, payments or dependency changes. All work lands in `public/hap/app.js` (markup only), `public/hap/ops.js` (markup only), `public/hap/styles.css`, and `src/lib/hap-routes.ts` / route titles where a label must match.
+All review corrections verified against the working tree before this rewrite. Nothing here is implemented. Note: I could not add these tasks to `roadmap.md` because plan mode only permits writing this file — the task list below is the roadmap and should be copied there in Task 1.
 
-## 1. Route and screen inventory (verified in code)
+## 1. Corrected current-state baseline (verified)
+
+- `/` is the React marketing page in `src/routes/index.tsx`. `landingPage()` in `public/hap/app.js` is the prototype's internal landing mode, not the site root.
+- `/preview` is a redirect to `/menu/{slug}` (`src/routes/preview.tsx`).
+- The prototype is mounted directly into the host document by `src/components/hap-app.tsx` — no iframe.
+- A global **View menu** action already exists: `prototypeBar()` at `app.js:1305`, `data-action="view-menu"`, `data-tour="preview-toggle"`. It renders in every non-landing mode, including Hap Control.
+- `share-menu` / `share-preview` copies or shares the link. It is not View menu and is not a duplicate.
+- Destructive confirmations and Undo already exist (`showConfirm`, toast undo). Only genuine gaps get touched.
+- `.mini-icon` is 32px visually but already has a 44px pseudo hit area (`styles.css:708-709`) and `:focus-visible` (`styles.css:983`). Project-wide target stays **44px**.
+- The real focus bug is `.inline-input:focus{outline:none}` (`styles.css:379`) overriding the global `:focus-visible` rule (`styles.css:706`).
+- `TOUR_STEPS` has **13** steps (`app.js:724`) but step 1 says "the five things that matter" and Settings shows "Run the focused 5-step guide" (`app.js:1757`). Step 10 also still says Appearance lives in Settings, which is stale.
+- QR copy is stale: `aria-label="QR code to this deployed Preview"` and "This QR uses the current deployed URL · #preview" (`app.js:1741`).
+
+## 2. Route and action inventory
 
 | Route | Screen | Renderer |
 | --- | --- | --- |
-| `/` | Landing + demo + auth sheet | `landingPage()` |
-| `/menu/$slug` | Public guest menu | `renderPreview()` |
-| `/preview` | Legacy, redirects into the public menu | `pendingMenuRedirect` |
+| `/` | React marketing page | `src/routes/index.tsx` |
+| `/menu/$slug` | Guest menu | `renderPreview()` |
+| `/preview` | Redirect | route only |
 | `/r/$slug/admin` | Overview | `adminHome()` |
 | `/r/$slug/admin/menu` | Menu › Items | `adminMenuItems()` |
 | `/r/$slug/admin/menu/design` | Menu › Design | `appearancePage()` |
 | `/r/$slug/admin/menu/promotions` | Menu › Promotions | `adminPromote()` |
-| `/r/$slug/admin/menu/qr` | QR subpage | `adminQr()` |
-| `/r/$slug/admin/insights` | Insights (Traffic/Dishes/Guests) | `analyticsPage()` |
-| `/r/$slug/admin/settings` | Settings (Restaurant/Team/Billing) | `adminSettingsHub()` |
-| `/r/$slug/admin/settings/restaurant\|team\|billing` | Same content as subpages | `renderAdminSubpage()` |
-| `/super`, `/super/{restaurants,users,plans,settings}` | Platform control | `ops.js` |
-| `/admin/*` | Legacy → tenant redirect | `admin.tsx` |
+| `/r/$slug/admin/menu/qr` | QR | `adminQr()` |
+| `/r/$slug/admin/insights` | Insights | `analyticsPage()` |
+| `/r/$slug/admin/settings[/restaurant\|team\|billing]` | Settings | hub + `renderAdminSubpage()` |
+| `/super/*` | Hap Control | `ops.js` |
+| `/admin/*` | Legacy redirect | `admin.tsx` |
 
-Bottom nav (restaurant): Overview · Menu · Insights · Settings. Structure is sound; the problems are duplication, action hierarchy and density, not the tab set.
+Verified duplications (only these):
 
-## 2. Duplicate-action inventory (all verified)
+1. Overview command row repeats Promotion, QR and Preview, all owned elsewhere; Preview also duplicates the prototype-bar View menu.
+2. Overview quick-action grid (Availability / Prices) duplicates Menu-owned bulk work.
+3. Overview header Settings icon duplicates the bottom-nav Settings tab.
+4. Settings › Appearance row duplicates Menu › Design (canonical).
+5. Settings tab content and `/settings/{restaurant,team,billing}` subpages render the same content through two different chromes (page head vs back-row).
+6. QR renders a back-row inside a tabbed workspace that already has a header.
+7. View menu appears in Hap Control, where it has no meaning — scope it to restaurant admin instead of adding anything.
 
-| Action | Appears at | Recommendation |
-| --- | --- | --- |
-| Open QR | Overview command row, Menu header icon, Menu command row, checklist row | Keep Menu header icon + checklist. Drop from both command rows. |
-| Promote / New promotion | Overview command row, Menu command row, Menu › Promotions primary button, category row `promote-category`, item row | Keep Promotions primary + row-level contextual. Drop from both command rows. |
-| Preview public menu | Overview command row, Design hero "Preview", `share-menu` on status card | One global "View menu" in the page header, same slot on every admin screen. |
-| Bulk availability / Bulk price | Overview "Quick actions" grid **and** Menu command row | Menu only — they act on menu data. |
-| Menu design | Menu › Design tab **and** Settings › Appearance row | Tab only; keep the URL alias, delete the Settings row. |
-| Settings | Overview header icon-btn + bottom-nav Settings | Drop the header icon. |
-| Restaurant/Team/Billing | Settings tabs **and** identical standalone subpage routes | Subpage routes redirect into the tab; delete `renderAdminSubpage` duplicates. |
-| Add item | Overview command row, Menu `add-chooser`, checklist, empty states | Keep; it is the one legitimately repeated primary. |
+Not duplication: Share on the status card; Add item in checklist/empty states; row-level Promote.
 
-Two same-purpose surfaces compete on Overview: the `command-row` (4 buttons) and the "Quick actions" card grid (2 buttons). One must go — the card grid.
+## 3. Screen-by-screen hierarchy
 
-## 3. Proposed action hierarchy per screen
+- **Overview** — Primary: permanent labelled **Add item** in the page header (never only inside the checklist). Secondary: Share on the live-status card. Tertiary: checklist rows, service switches, signals. Removed: Promotion/QR/Preview command buttons, Availability/Prices grid, header Settings icon.
+- **Menu › Items** — Primary: one labelled **Add** parent action offering Item or Category. Search stays full-width on its own row; a second compact toolbar holds filters, density and a labelled **More** menu. No split button. Category row keeps expand/collapse inline; rename, reorder, promote, delete move into a labelled category overflow menu.
+- **Menu › Design** — Canonical appearance home. Pickers only; Share keeps its own label.
+- **Menu › Promotions** — Primary: New promotion. Segments are navigation. "How promotions read" becomes collapsible help.
+- **Menu › QR** — One page header, no back-row; Download primary, Share secondary; corrected copy.
+- **Insights** — No primary action. Ranges + tabs; Seed demo data stays visible and explicitly labelled demo-only.
+- **Settings** — One shared renderer, tab from URL. Restaurant: Save. Team: Invite. Billing: read-only.
 
-- **Overview** — Primary: Add dish. Secondary: Share menu (status card). Tertiary: checklist rows, service toggles. No command row, no quick-action grid. Signals link out; they never duplicate an action.
-- **Menu › Items** — Primary: header `+` Add (Item / Category chooser — already the pattern). Secondary: search, filter chips, density toggle in one toolbar. Contextual: per-row price / 86 / hide / promote. Destructive: delete, inside the row menu with confirm. Command row removed; sold-out + price bulk actions move into the toolbar as a single "Bulk edit" split control.
-- **Menu › Design** — Primary: View menu. Everything else is a picker; no competing buttons.
-- **Menu › Promotions** — Primary: New promotion. Segment tabs are navigation, not actions. The static "How promotions read" list becomes collapsed help.
-- **Insights** — No primary action. Range chips + tabs only; "Seed demo data" is a prototype affordance and moves behind Settings › Prototype tools.
-- **Settings** — Primary: Save changes (sticky, enabled only when dirty). Team: Invite. Billing: read-only.
-- **Public menu** — Primary: language/search; nothing else competes.
+## 4. Accessibility requirements
 
-## 4. Findings by priority
+44px inventory to audit and fix individually: segment buttons, category chips, range/filter chips, back buttons, quick-action pills, dialog/sheet close buttons, tour controls, switches, bottom-nav items, `.item-action`, `.rate-tools .mini-icon` (currently 28px), density buttons.
 
-**Critical**
-1. Overview has two competing action clusters and 6 quick actions, 4 of which are owned by other screens. → Remove the quick-action grid and reduce the command row to nothing; Overview becomes status + checklist + signals. *Why:* it stops teaching two paths to the same job. *Risk:* low. *Accept:* every Overview action still reachable in ≤2 taps.
-2. Settings duplicated as both tabs and subpage routes with a different chrome (`subHead` back-row vs page head). → One rendering; subpage paths select the tab. *Accept:* `/settings/team` opens Settings with Team active, no back-row.
-3. Design reachable from two places with different labels ("Menu design" vs "Design"). → One label: **Design**, everywhere.
+Separate criteria: accessible names on every icon-only Back/Close; `role="switch"` + `aria-checked` on Overview service switches; `aria-current="page"` on bottom nav; correct link vs tab semantics with associated panels (`role="tablist"/"tab"/"tabpanel"`, `aria-controls`); `aria-labelledby` on sheets, dialogs and confirmations; remove the `.inline-input:focus{outline:none}` conflict; keyboard-only traversal of every screen; screen-reader pass; 200% zoom; `prefers-reduced-motion`; contrast; safe-area insets and no horizontal overflow.
 
-**High**
-4. No global "View menu" affordance; it is spelled Preview / Share / View. → One header action `View menu`, same icon and label on all admin screens.
-5. Menu screen stacks page head + command row + search + toolbar + category strip = ~5 control rows before any content on a 390px screen. → Collapse to header + search/toolbar row + category strip.
-6. QR is a subpage with its own back-row inside a tabbed workspace — inconsistent chrome. → Same page-head pattern as its siblings, entered from the Menu header.
-7. Destructive actions (delete item/category, reset demo data) need a uniform confirm dialog; `showConfirm` exists but is not used everywhere.
-8. Touch targets: `.mini-icon` category actions are ~31–32px. → 40px minimum.
+## 5. Implementation tasks (one branch and PR each)
 
-**Medium**
-9. Terminology drift: Promote / Promotions / Promotion; Staff / Team; Dishes / Items. → Fix on one term each: **Promotions**, **Team**, **Dishes**.
-10. No unsaved-change warning on Settings; the Save button is always enabled.
-11. Empty states exist on some lists (`emptyState` in ops) and are ad-hoc `<div class="card empty">` elsewhere. → One `emptyState` helper used by all.
-12. `:focus-visible` is present in newer CSS but absent on older inputs and `.mini-icon`. → One global focus ring token.
-13. Insights shows a full range-chip row plus tabs plus stat grid with no primary story; tighten spacing and lead with a single headline number.
-14. Billing "Coming soon" card and the "Prototype billing" footnote say the same thing twice.
+Every task: **scope · files · classification · acceptance · regression · rollback · excluded**.
 
-**Low**
-15. `tplMini()` is dead code superseded by `templatePreview()`.
-16. Landing page and admin use different button scales.
-17. Superadmin table rows reuse `data-row` but Users/Plans differ in cell rhythm.
+1. **PROJECT_STATE Now** — docs. `docs/PROJECT_STATE.md`. Accept: Phase 1 is the approved Now item with this task list; roadmap.md carries the same list. Regression: none. Rollback: revert doc. Excluded: any app change.
+2. **Baseline correction** — docs. `.lovable/plan.md`, `README.md` where stale. Accept: no claim contradicts main. Excluded: app code.
+3. **Accessibility semantics + 44px inventory** — accessibility. `app.js`, `ops.js`, `styles.css`. Accept: every control in §4 ≥44px effective; all listed ARIA criteria pass; inline-input focus visible. Regression: no layout shift at 320px; existing focus rings intact. Rollback: revert CSS/attribute commit. Excluded: layout restructuring.
+4. **Settings shared renderer** — routing + markup. `app.js`, `src/lib/hap-routes.ts`. Accept: `/settings/restaurant|team|billing` still deep-link, refresh, share, Back/Forward and keep their route titles; one chrome, no back-row; tab derives from URL. Regression: legacy aliases resolve. Excluded: dirty-state logic.
+5. **Overview hierarchy** — markup/layout. `app.js`, `styles.css`. Accept: permanent labelled Add item in header; Share preserved; command row and quick-action grid and Settings icon gone; no new View menu. Excluded: checklist logic, service-toggle behaviour.
+6. **Menu Items layout + category grouping** — markup/layout. `app.js`, `styles.css`. Accept: full-width search row + compact toolbar; labelled Add parent action; expand/collapse inline, other category actions in a labelled overflow; no overflow at 320px. Excluded: any bulk behaviour change.
+7. **Menu bulk behaviour** — interaction/state, only after a workflow decision. Excluded from 6.
+8. **Design + QR cleanup** — markup + routing. Accept: Settings Appearance row removed with the alias preserved; QR single header; stale Preview/#preview copy corrected; Share keeps its label; deep links and history unchanged.
+9. **Promotions disclosure** — markup + interaction. Accept: help is a labelled button with `aria-expanded`, a controlled region id, collapsed by default.
+10. **Settings dirty state** — interaction/state. Accept: Save disabled when clean; leave warning on dirty navigation.
+11. **Insights empty/populated layout** — markup + decision. Accept: demo-data action visible and labelled demo-only until a one-step alternative exists.
+12. **Terminology** — documentation then markup, owner-approved only. Until approval: keep **Items**, **Add item**, **Promotions**, **Team**. Decisions needed: Items vs Dishes (mixed today), Promote vs Promotions on row actions, Staff vs Team in `ops.js`, Insights vs Analytics in legacy paths. No silent mixing.
+13. **Onboarding reassessment** — interaction. Fix "five things"/"5-step guide" against 13 real steps, correct the stale Appearance-in-Settings step, make the tour non-blocking for the first useful workflow.
+14. **Full verification** — see §7.
 
-## 5. Global design rules
+## 6. Deferred
 
-Page head pattern (eyebrow / title / subtitle / one action slot) on every screen — no `back-row` inside tabbed workspaces. One primary button per screen. Icon-only buttons always carry `aria-label`. Minimum target 40px, 44px for primary. Section spacing on an 8px scale. Filter chips = state, segment control = navigation, never mixed. Confirm every destructive action. One term per concept.
+Desktop/tablet admin layout (Phase 2); auth, roles and tenancy; Hap Control redesign; real analytics; self-serve billing; routed sheets/back-button overlay handling; multi-menu UI; bulk behaviour until Task 7's decision.
 
-## 6. Implementation batches (one route/component group each)
+## 7. Verification matrix
 
-1. Overview: remove quick-action grid + command row, add global View menu slot.
-2. Menu › Items: toolbar consolidation, bulk-edit control, remove command row, 40px targets.
-3. Menu › Design + QR: unify chrome, single label, QR page head.
-4. Menu › Promotions: primary hierarchy, collapse the styles explainer.
-5. Settings: tabs as the only rendering, dirty-state Save, delete Appearance row.
-6. Insights: density and range/tab layout, move seed action out.
-7. Global CSS pass: focus ring, target sizes, spacing scale, empty-state helper.
-8. Terminology + labels sweep incl. `hap-routes.ts` titles.
-9. Verification pass.
+Screens: guest menu, Overview, Menu Items, Design, Promotions, QR, Insights, Settings ×3 tabs, Hap Control. Widths: 320 / 390 / 430 px, plus ≥700px only to confirm the framed presentation does not regress. Per screen: zero console errors; zero horizontal overflow; one primary action; all §4 targets ≥44px; visible focus on every control including inline inputs; keyboard-only traversal; SR names on icon-only controls; deep link + refresh + Back/Forward per route; destructive confirm and Undo still work; light and dark; reduced motion; 200% zoom.
 
-Quick wins (can ship first): 3, 8, 9, 14, 15.
+## 8. Proposed `docs/PROJECT_STATE.md` Now section
 
-## 7. Deferred (not Phase 1)
-
-Desktop/tablet layouts — the app is hard-capped at `max-width:430px` (`styles.css:58`), so there is no desktop layout to audit; introducing one is a redesign, not a Phase 1 correction. Auth/role boundaries, superadmin redesign, real analytics, self-serve billing, routed sheets/back-button overlay handling, multi-menu UI.
-
-## 8. Verification checklist
-
-Headless pass at 320 / 390 / 430 px on `/menu/sofra`, Overview, Menu (all three tabs), QR, Insights, Settings: zero console errors, zero horizontal overflow, every interactive target ≥40px, one primary button per screen, focus ring visible on every control, destructive actions confirm, Settings Save disabled when clean, all legacy URLs still resolve. At ≥700px only the framed-phone presentation is checked, since no desktop layout exists yet.
-
-## 9. Open decision
-
-Desktop and tablet are currently the same 430px phone frame. Confirm whether Phase 1 should stay mobile-only (recommended) or whether a real desktop admin layout should be scheduled as Phase 2.
+> **Now — one current priority:** Phase 1 — UI/UX, information architecture and action hierarchy correction of the existing Hap prototype. Mobile-first at 320/390/430px; ≥700px only checked for no regression. No changes to authentication, data, payments, dependencies or business logic. Delivered as the numbered tasks in `.lovable/plan.md`, one branch and pull request each, each independently reviewable and revertible. Desktop/tablet admin layout is deferred to Phase 2.
