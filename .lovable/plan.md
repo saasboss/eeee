@@ -1,70 +1,105 @@
-# Design system: palettes, clean default template, real previews, fewer knobs
+# Phase 1 — UI/UX, IA and action-hierarchy audit
 
-## Critique of the previous prompt (what was wrong with it)
+Scope: presentation, layout, navigation and action structure only. No business logic, data, auth, payments or dependency changes. All work lands in `public/hap/app.js` (markup only), `public/hap/ops.js` (markup only), `public/hap/styles.css`, and `src/lib/hap-routes.ts` / route titles where a label must match.
 
-1. **Too vague on data.** "Add a PALETTES table" without naming the state migration path, the dead keys already in state (`backgroundIntensity`, `cards`, `radius`), or the consumers (`header-*`, `typography-*`, `images-*`, `category-*` CSS at styles.css:161, 316–319, 928–929) — an agent could add palettes and leave the old single-hex path live in parallel.
-2. **Vague on the shared-emit point.** It didn't name the three places palette variables must be injected (`renderPublicMenu` app.js:1923, `templatePreview` app.js:1640, `promoPreview` app.js:2190), which is the entire correctness argument of the feature.
-3. **Missed selection mechanics.** The template row uses in-place selection (`selectTemplateCard` app.js:1659, `.template-dots` app.js:1672); the prompt didn't say palettes/backgrounds must reuse it, inviting full re-renders that break scroll and drop focus.
-4. **No dark-mode spec.** `.public-root` has a hardcoded dark override (styles.css:98); palette × dark is a 2D matrix and was unaddressed.
-5. **No accessibility spec beyond one contrast sentence** — no `:focus-visible`, no `aria-pressed` on new rows, no reduced-motion for snap scrolling.
-6. **Batching ignored mutation hotspots.** Four batches still collided on the appearance render block; batching must be by file region, not by topic.
-7. **Verification too weak** — didn't cover state migration of existing saved restaurants, the onboarding tour step `data-tour="template"`, or the QR preview surface.
+## 1. Route and screen inventory (verified in code)
 
-## Verified current state
+| Route | Screen | Renderer |
+| --- | --- | --- |
+| `/` | Landing + demo + auth sheet | `landingPage()` |
+| `/menu/$slug` | Public guest menu | `renderPreview()` |
+| `/preview` | Legacy, redirects into the public menu | `pendingMenuRedirect` |
+| `/r/$slug/admin` | Overview | `adminHome()` |
+| `/r/$slug/admin/menu` | Menu › Items | `adminMenuItems()` |
+| `/r/$slug/admin/menu/design` | Menu › Design | `appearancePage()` |
+| `/r/$slug/admin/menu/promotions` | Menu › Promotions | `adminPromote()` |
+| `/r/$slug/admin/menu/qr` | QR subpage | `adminQr()` |
+| `/r/$slug/admin/insights` | Insights (Traffic/Dishes/Guests) | `analyticsPage()` |
+| `/r/$slug/admin/settings` | Settings (Restaurant/Team/Billing) | `adminSettingsHub()` |
+| `/r/$slug/admin/settings/restaurant\|team\|billing` | Same content as subpages | `renderAdminSubpage()` |
+| `/super`, `/super/{restaurants,users,plans,settings}` | Platform control | `ops.js` |
+| `/admin/*` | Legacy → tenant redirect | `admin.tsx` |
 
-- Default state (app.js:700): `appearance:{template:'modern', brand:'#8a543c', background:'paper', backgroundIntensity:'low', cards:'soft', images:'soft', radius:'medium', categoryBar:'pill', promotionStyle:'framed', typography:'mixed', header:'compact', mode:'light'}`. `backgroundIntensity` and `cards` have no consumers (dead keys); `radius` is consumed only via `radius-low/high` (app.js:1923).
-- Single-hex brand swatches hardcoded at app.js:1693; colour input at same line.
-- Palette variables today: only `--menu-brand`/`--brand` set inline; `--menu-bg/surface/text/muted/line` are one fixed cream set at styles.css:98 with a fixed dark override on the same line.
-- Template ids and aliases: `modern/editorial/noir/street/grid`, `TEMPLATE_ALIASES` app.js:399. Consumers of micro-knob classes: styles.css:161, 316–319, 928–929.
-- Design screen render block: app.js:1686–1699. Background cards are flat `div`s (app.js:1695); template cards use the real `templatePreview()` (app.js:1635–1654).
+Bottom nav (restaurant): Overview · Menu · Insights · Settings. Structure is sound; the problems are duplication, action hierarchy and density, not the tab set.
 
----
+## 2. Duplicate-action inventory (all verified)
 
-# Prompt for the implementing agent
+| Action | Appears at | Recommendation |
+| --- | --- | --- |
+| Open QR | Overview command row, Menu header icon, Menu command row, checklist row | Keep Menu header icon + checklist. Drop from both command rows. |
+| Promote / New promotion | Overview command row, Menu command row, Menu › Promotions primary button, category row `promote-category`, item row | Keep Promotions primary + row-level contextual. Drop from both command rows. |
+| Preview public menu | Overview command row, Design hero "Preview", `share-menu` on status card | One global "View menu" in the page header, same slot on every admin screen. |
+| Bulk availability / Bulk price | Overview "Quick actions" grid **and** Menu command row | Menu only — they act on menu data. |
+| Menu design | Menu › Design tab **and** Settings › Appearance row | Tab only; keep the URL alias, delete the Settings row. |
+| Settings | Overview header icon-btn + bottom-nav Settings | Drop the header icon. |
+| Restaurant/Team/Billing | Settings tabs **and** identical standalone subpage routes | Subpage routes redirect into the tab; delete `renderAdminSubpage` duplicates. |
+| Add item | Overview command row, Menu `add-chooser`, checklist, empty states | Keep; it is the one legitimately repeated primary. |
 
-Work in `public/hap/app.js` and `public/hap/styles.css` only. No new dependencies, no build step, no changes to `data.js`/`services.js`/`ops.js` or TanStack routes. Batches below are split by file region so one file is never edited twice in one batch. Run ONE headless-browser verification per batch end, not per edit.
+Two same-purpose surfaces compete on Overview: the `command-row` (4 buttons) and the "Quick actions" card grid (2 buttons). One must go — the card grid.
 
-## Batch 1 — Palette engine (app.js data + helpers)
+## 3. Proposed action hierarchy per screen
 
-1. Replace the `templates` array (app.js:391–397) with objects: `{id, name, sub, defaultPalette, palettes:[…paletteIds], defaults:{header, categoryBar, images, typography, radius}}`. Convert all destructuring `[id,name,sub]` consumers (app.js:1686, 1692, 2556) to object access in the same edit.
-2. Add `PALETTES` (10 entries, ids: `terra, ember, olive, coast, indigo, plum, forest, slate, noir-gold, clay-sand`): each `{id, name, light:{brand, accent, bg, surface, text, muted, line}, dark:{…same 7}}`. `accent` is the supporting secondary (used for kickers, borders, offer strip) — never equal to `brand`. No single-hue palettes; every entry must be primary + tinted companion.
-3. State: add `appearance.palette` (default `terra`), keep `brand` as a derived mirror of the palette's `light.brand` for backwards compat with any code reading `a.brand`. In the load/normalize path (near app.js:929), map old states: if no `palette`, infer the closest palette from `brand`; if a `palette` exists and `brand` ≠ its primary, the owner's custom colour wins via a `palette:'custom'` sentinel.
-4. One helper `paletteVars(a, dark)` returning the inline-style fragment `--menu-brand:…;--menu-accent:…;--menu-bg:…;--menu-surface:…;--menu-text:…;--menu-muted:…;--menu-line:…`. It must be the ONLY place palette values enter markup.
-5. Wire `paletteVars` into all three emit points: `renderPublicMenu` (app.js:1923), `templatePreview` (app.js:1640), `promoPreview` (app.js:2190) — replacing the current `--menu-brand` fragment in each.
-6. Custom colour input stays: derive `accent/bg/surface/muted/line` from the picked hex via `color-mix()` in `paletteVars` when `palette==='custom'`, so custom never yields a flat one-colour theme.
+- **Overview** — Primary: Add dish. Secondary: Share menu (status card). Tertiary: checklist rows, service toggles. No command row, no quick-action grid. Signals link out; they never duplicate an action.
+- **Menu › Items** — Primary: header `+` Add (Item / Category chooser — already the pattern). Secondary: search, filter chips, density toggle in one toolbar. Contextual: per-row price / 86 / hide / promote. Destructive: delete, inside the row menu with confirm. Command row removed; sold-out + price bulk actions move into the toolbar as a single "Bulk edit" split control.
+- **Menu › Design** — Primary: View menu. Everything else is a picker; no competing buttons.
+- **Menu › Promotions** — Primary: New promotion. Segment tabs are navigation, not actions. The static "How promotions read" list becomes collapsed help.
+- **Insights** — No primary action. Range chips + tabs only; "Seed demo data" is a prototype affordance and moves behind Settings › Prototype tools.
+- **Settings** — Primary: Save changes (sticky, enabled only when dirty). Team: Invite. Billing: read-only.
+- **Public menu** — Primary: language/search; nothing else competes.
 
-## Batch 2 — Default template + per-template theming (styles.css)
+## 4. Findings by priority
 
-1. Rework `modern` (Aria) into the clean universal default: warm-neutral surfaces, one restrained serif/sans pair, works with and without dish photos, no decorative gimmick. It must be the best template, not the plainest — this is what a new admin ships untouched.
-2. Give each of the other four templates its own default palette (from `template.defaultPalette`) and delete the fixed cream override at styles.css:98 in favour of palette-driven variables; keep `.dark-menu`/dark handling but sourced from `palette.dark`.
-3. Fold the micro-knob CSS (styles.css:161, 316–319, 928–929) into each template's own rules using the template's `defaults`; then delete the standalone `header-*`, `typography-*`, `images-*`, `radius-*`, `category-*` class blocks and stop emitting those classes in `renderPublicMenu`.
-4. Keep `TEMPLATE_ALIASES` intact; verify old saved template ids still resolve.
-5. Contrast budget, checked not assumed: body text ≥ 4.5:1 on surface, price/accent ≥ 3:1, in light and dark, for every palette × template combo. Log a contrast table to the console during verification; any failure = adjust the palette, not the rule.
+**Critical**
+1. Overview has two competing action clusters and 6 quick actions, 4 of which are owned by other screens. → Remove the quick-action grid and reduce the command row to nothing; Overview becomes status + checklist + signals. *Why:* it stops teaching two paths to the same job. *Risk:* low. *Accept:* every Overview action still reachable in ≤2 taps.
+2. Settings duplicated as both tabs and subpage routes with a different chrome (`subHead` back-row vs page head). → One rendering; subpage paths select the tab. *Accept:* `/settings/team` opens Settings with Team active, no back-row.
+3. Design reachable from two places with different labels ("Menu design" vs "Design"). → One label: **Design**, everywhere.
 
-## Batch 3 — Design screen rebuild (rewrite app.js:1686–1699 as one block)
+**High**
+4. No global "View menu" affordance; it is spelled Preview / Share / View. → One header action `View menu`, same icon and label on all admin screens.
+5. Menu screen stacks page head + command row + search + toolbar + category strip = ~5 control rows before any content on a 390px screen. → Collapse to header + search/toolbar row + category strip.
+6. QR is a subpage with its own back-row inside a tabbed workspace — inconsistent chrome. → Same page-head pattern as its siblings, entered from the Menu header.
+7. Destructive actions (delete item/category, reset demo data) need a uniform confirm dialog; `showConfirm` exists but is not used everywhere.
+8. Touch targets: `.mini-icon` category actions are ~31–32px. → 40px minimum.
 
-1. Sections become: **Template** (existing live `templatePreview` cards, unchanged) → **Palette** (snap row of pair swatches — brand + accent in one chip, name under it, check on the active one, page dots reusing the `.template-dots` pattern) → **Background** (new `backgroundPreview(id)`: a scaled real `.public-root` mini-page with `bg-<id>` and the current palette applied, mirroring `templatePreview`) → light/dark.
-2. Delete the Header / Category bar / Images / Typography groups from the render. The state keys remain and are set from `template.defaults` on template switch.
-3. Palette and background taps use in-place selection like `selectTemplateCard` (app.js:1659): toggle classes, update dots, persist via `save()`, toast — no `render()` call. The in-place handler must also live-update the background cards when the palette changes (they render the palette).
-4. Accessibility: `aria-pressed` on every picker button, visible `:focus-visible` ring, `prefers-reduced-motion` honoured on the snap rows.
-5. The onboarding tour step `data-tour="template"` (app.js:637, 1475) must still land correctly — keep the attribute on the template group.
+**Medium**
+9. Terminology drift: Promote / Promotions / Promotion; Staff / Team; Dishes / Items. → Fix on one term each: **Promotions**, **Team**, **Dishes**.
+10. No unsaved-change warning on Settings; the Save button is always enabled.
+11. Empty states exist on some lists (`emptyState` in ops) and are ad-hoc `<div class="card empty">` elsewhere. → One `emptyState` helper used by all.
+12. `:focus-visible` is present in newer CSS but absent on older inputs and `.mini-icon`. → One global focus ring token.
+13. Insights shows a full range-chip row plus tabs plus stat grid with no primary story; tighten spacing and lead with a single headline number.
+14. Billing "Coming soon" card and the "Prototype billing" footnote say the same thing twice.
 
-## Batch 4 — Friction reducers (reuse the Menu tab component + pager helper)
+**Low**
+15. `tplMini()` is dead code superseded by `templatePreview()`.
+16. Landing page and admin use different button scales.
+17. Superadmin table rows reuse `data-row` but Users/Plans differ in cell rhythm.
 
-1. **Settings** (`/admin/settings`): one screen, three tabs — Restaurant / Team / Billing — replacing the settings rows that only navigate.
-2. **Insights**: tabs Traffic / Dishes / Guests + a horizontal date-range chip row.
-3. **Overview**: a 4-action command row (Add dish, New promotion, Share QR, Preview menu) directly under the header.
-4. **Items**: sticky horizontal category chip strip; inline quick actions (price edit, 86 toggle, hide) without opening a sheet; a 2-column compact grid toggle for scanning long menus.
+## 5. Global design rules
 
-## Batch 5 — One verification pass (headless browser)
+Page head pattern (eyebrow / title / subtitle / one action slot) on every screen — no `back-row` inside tabbed workspaces. One primary button per screen. Icon-only buttons always carry `aria-label`. Minimum target 40px, 44px for primary. Section spacing on an 8px scale. Filter chips = state, segment control = navigation, never mixed. Confirm every destructive action. One term per concept.
 
-At `/menu/sofra` and `/r/sofra/admin/menu/design`, 320/390/430 px:
-- Every template × its default palette × light/dark renders; zero console errors; zero horizontal overflow.
-- Palette switch updates public menu, background previews and promo preview identically (screenshot diff of the three surfaces).
-- Background cards show visibly different real patterns (not flat fills).
-- A saved old-shape state (single `brand`, no `palette`, legacy template alias like `classy`) loads without error and migrates.
-- Contrast table printed; `data-tour="template"` present; picker taps don't reset scroll position.
+## 6. Implementation batches (one route/component group each)
 
-## Hard constraints
+1. Overview: remove quick-action grid + command row, add global View menu slot.
+2. Menu › Items: toolbar consolidation, bulk-edit control, remove command row, 40px targets.
+3. Menu › Design + QR: unify chrome, single label, QR page head.
+4. Menu › Promotions: primary hierarchy, collapse the styles explainer.
+5. Settings: tabs as the only rendering, dirty-state Save, delete Appearance row.
+6. Insights: density and range/tab layout, move seed action out.
+7. Global CSS pass: focus ring, target sizes, spacing scale, empty-state helper.
+8. Terminology + labels sweep incl. `hap-routes.ts` titles.
+9. Verification pass.
 
-- No full `render()` on picker taps. No new dependencies. No `*.client.*` modules. Business logic, data seeds, QR generation and promotions logic untouched. Every palette value must come through `paletteVars`; grep for stray `--menu-brand:` literals after Batch 1 and eliminate them.
+Quick wins (can ship first): 3, 8, 9, 14, 15.
+
+## 7. Deferred (not Phase 1)
+
+Desktop/tablet layouts — the app is hard-capped at `max-width:430px` (`styles.css:58`), so there is no desktop layout to audit; introducing one is a redesign, not a Phase 1 correction. Auth/role boundaries, superadmin redesign, real analytics, self-serve billing, routed sheets/back-button overlay handling, multi-menu UI.
+
+## 8. Verification checklist
+
+Headless pass at 320 / 390 / 430 px on `/menu/sofra`, Overview, Menu (all three tabs), QR, Insights, Settings: zero console errors, zero horizontal overflow, every interactive target ≥40px, one primary button per screen, focus ring visible on every control, destructive actions confirm, Settings Save disabled when clean, all legacy URLs still resolve. At ≥700px only the framed-phone presentation is checked, since no desktop layout exists yet.
+
+## 9. Open decision
+
+Desktop and tablet are currently the same 430px phone frame. Confirm whether Phase 1 should stay mobile-only (recommended) or whether a real desktop admin layout should be scheduled as Phase 2.
