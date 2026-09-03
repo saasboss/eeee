@@ -20,7 +20,8 @@ Before planning or editing, read:
 1. `docs/START_HERE.md`
 2. `docs/PROJECT_STATE.md`
 3. `docs/MODEL_ROUTING.md`
-4. The current task or handoff, if one exists
+4. `docs/AI_WORK_LOG.md`
+5. The active pull request and current task or handoff, if one exists
 
 If these documents conflict, this file wins. Ask the user only when a decision would materially change the product, security, cost, or scope.
 
@@ -35,6 +36,16 @@ If these documents conflict, this file wins. Ask the user only when a decision w
 - Before editing, state the goal, acceptance criteria, intended files, model tier, and rollback.
 - Before merging, inspect the complete diff and run checks appropriate to the changed files.
 - Merge only when the user explicitly asks for it or requests an end-to-end finished task.
+
+## Shared AI coordination
+
+- GitHub is the shared memory. Private Codex, Claude, and Lovable chats are not shared automatically.
+- Before writing, inspect open pull requests and `docs/AI_WORK_LOG.md`. If another agent owns an overlapping task, branch, or file set, stop and coordinate instead of duplicating work.
+- The active pull request is the task's shared conversation. Record material decisions, review findings, checks, blockers, and next actions in its description or comments.
+- One provider builds. A different provider may review the same pull request read-only, but must not edit the builder's branch unless explicitly assigned.
+- Before switching providers/accounts or stopping unfinished work, post a handoff in the active pull request using `docs/HANDOFF_TEMPLATE.md`.
+- Do not commit full private-chat transcripts. Preserve concise facts and decisions, and never include secrets or credentials.
+- After merge and verification, update `docs/PROJECT_STATE.md` when the product's Now, Next, Later/deferred, Done, or Decisions changed.
 
 ## Product-state discipline
 
