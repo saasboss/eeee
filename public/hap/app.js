@@ -1636,14 +1636,14 @@ function adminHome(){
    menu, and the promotions running on it. */
 function menuTabBar(){
  const active=menuTab();
- return `<div class="segment-control menu-tabbar" role="tablist" aria-label="Menu sections">${MENU_TABS.map(([id,label])=>`<button id="menu-tab-${id}" class="${active===id?'active':''}" role="tab" aria-selected="${active===id}" aria-controls="menu-panel-${id}" data-action="menu-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
+ return `<div class="segment-control menu-tabbar" role="tablist" aria-label="Menu sections">${MENU_TABS.map(([id,label])=>`<button id="menu-tab-${id}" class="${active===id?'active':''}" role="tab" aria-selected="${active===id}" aria-controls="menu-panel" data-action="menu-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
 }
 function adminMenu(){
  const tab=menuTab();
  const body = tab==='design' ? (canAccess('design')?appearancePage():noPermissionPage('design'))
   : tab==='promotions' ? adminPromote()
   : adminMenuItems();
- return `${menuTabBar()}<div id="menu-panel-${tab}" role="tabpanel" aria-labelledby="menu-tab-${tab}">${body}</div>`;
+ return `${menuTabBar()}<div id="menu-panel" role="tabpanel" aria-labelledby="menu-tab-${tab}">${body}</div>`;
 }
 function adminMenuItems(){
  const q=(ui.adminSearch||'').trim().toLowerCase();
@@ -1727,8 +1727,8 @@ function adminPromote(){
  <button class="btn primary full" style="margin-bottom:12px" data-action="promo-chooser">${icon('plus',16)} New promotion</button>
  ${ui.promoError?`<div class="promo-warn">${escapeHtml(ui.promoError)}</div>`:''}
  ${itemCount>3?`<div class="promo-warn">${itemCount} promotions active — the menu stops feeling special.</div>`:''}
- <div class="segment-control" role="tablist" aria-label="Promotion status" style="margin-bottom:12px">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel-${id}" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
- <div id="promotions-panel-${segment}" role="tabpanel" aria-labelledby="promotions-tab-${segment}">${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
+ <div class="segment-control" role="tablist" aria-label="Promotion status" style="margin-bottom:12px">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
+ <div id="promotions-panel" role="tabpanel" aria-labelledby="promotions-tab-${segment}">${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
  <section class="section"><div class="section-row"><div><div class="section-title">How promotions read</div><div class="page-subtitle">Five compositions. Each one keeps the price protected.</div></div></div><div class="settings-list">${PROMO_STYLES.map(([id,n,desc])=>`<div class="card settings-row"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(desc)}</span></div></div>`).join('')}</div></section>`;
 
 }
@@ -1750,8 +1750,8 @@ function adminSettingsHub(){
   : tab==='billing' ? (canAccess(SUBPAGE_ACCESS.billing)?stripHeads(billingPage()):noPermissionPage(SUBPAGE_ACCESS.billing))
   : (canAccess(SUBPAGE_ACCESS.restaurant)?stripHeads(HapOps.adminSubpages.opsSettings(ctx)):noPermissionPage(SUBPAGE_ACCESS.restaurant));
  return `<div class="page-head"><div><div class="eyebrow">Restaurant controls</div><h1 class="page-title">Settings</h1><p class="page-subtitle">Everything else, without turning into a settings maze.</p></div></div>
- <div class="segment-control settings-tabbar" role="tablist" aria-label="Settings sections">${SETTINGS_TABS.map(([id,label])=>`<button id="settings-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="settings-panel-${id}" data-action="settings-tab" data-tab="${id}">${label}</button>`).join('')}</div>
- <div id="settings-panel-${tab}" role="tabpanel" aria-labelledby="settings-tab-${tab}">${body}</div>
+ <div class="segment-control settings-tabbar" role="tablist" aria-label="Settings sections">${SETTINGS_TABS.map(([id,label])=>`<button id="settings-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="settings-panel" data-action="settings-tab" data-tab="${id}">${label}</button>`).join('')}</div>
+ <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab-${tab}">${body}</div>
  <section class="section"><div class="section-row"><div class="section-title">Appearance</div></div><div class="settings-list">
   <button class="card settings-row" data-action="menu-tab" data-tab="design"><div class="settings-icon">${icon('palette',18)}</div><div class="settings-copy"><strong>Menu design</strong><span>Template, palette and background</span></div>${icon('chevron',17)}</button>
  </div></section>
@@ -1979,7 +1979,7 @@ function analyticsPage(){
   : `<div class="page-head"><div><div class="eyebrow">${range==='all'?'All time':'Last '+(INSIGHT_RANGES.find(r=>r[0]===range)||[,'7 days'])[1]}</div><h1 class="page-title">Insights</h1><p class="page-subtitle">What guests actually did on your menu</p></div></div>`;
  const ranges=`<div class="range-chips" role="group" aria-label="Date range">${INSIGHT_RANGES.map(([id,label])=>`<button class="filter-chip ${range===id?'active':''}" data-action="insights-range" data-range="${id}" aria-pressed="${range===id}">${label}</button>`).join('')}</div>`;
  const tab=insightsTab();
- const tabbar=`<div class="segment-control insights-tabbar" role="tablist" aria-label="Insight sections">${INSIGHT_TABS.map(([id,label])=>`<button id="insights-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="insights-panel-${id}" data-action="insights-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
+ const tabbar=`<div class="segment-control insights-tabbar" role="tablist" aria-label="Insight sections">${INSIGHT_TABS.map(([id,label])=>`<button id="insights-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="insights-panel" data-action="insights-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
  if(res.status==='denied') return `${head}${noPermissionPage('menu')}`;
  if(res.status!=='ok'||!events.length){
   return `${head}${ranges}
@@ -2000,7 +2000,7 @@ function analyticsPage(){
  const guests = `<section class="section"><div class="section-title" style="margin-bottom:10px">Guest languages</div><div class="card bar-list">${bars(langRows.map(([n,c,pct])=>[n,c,pct]))}</div></section>
  <section class="section"><div class="section-title" style="margin-bottom:10px">Filters used</div><div class="card bar-list">${bars([...(s.dietFilters||[]).map(([d,n])=>[dietLabel(d),n,100]),...(s.allergenFilters||[]).map(([c,n])=>[allergenFull(c),n,100])].map((r,_,arr)=>{const max=Math.max(...arr.map(x=>x[1]));return [r[0],r[1],Math.round(r[1]/max*100)];}))}</div></section>`;
  return `${head}${tabbar}${ranges}
- <div id="insights-panel-${tab}" role="tabpanel" aria-labelledby="insights-tab-${tab}">${tab==='dishes'?dishes:tab==='guests'?guests:traffic}</div>
+ <div id="insights-panel" role="tabpanel" aria-labelledby="insights-tab-${tab}">${tab==='dishes'?dishes:tab==='guests'?guests:traffic}</div>
  <p class="fx-note">Counts come only from guest sessions on your public menu. Owner previews are excluded.</p>`;
 }
 
