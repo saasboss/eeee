@@ -990,3 +990,18 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
  .command-btn,.quick-pill,.cat-chip{transition:none}
  .command-btn:active{transform:none}
 }
+
+/* --- Phase 1 Task 10: calmer Overview hierarchy --- */
+.overview-add{align-self:flex-start;white-space:nowrap}
+.status-card{padding:12px;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:8px}
+.status-orb{width:36px;height:36px;border-radius:12px}
+.status-card>div:nth-child(2){min-width:0}
+.status-card span{display:block;line-height:1.4}
+.status-card .chip-btn{min-height:44px}
+.checklist{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.checklist-head{margin-bottom:8px}
+.ring{width:40px;height:40px}
+.ring span{width:32px;height:32px}
+.checklist-body{gap:0;border-top:1px solid var(--line)}
+.check-row{min-height:48px;gap:8px;padding:8px 0}
+
