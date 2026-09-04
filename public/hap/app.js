@@ -34,11 +34,11 @@ const ADMIN_TAB_PATHS = {home:'/admin',menu:'/admin/menu',insights:'/admin/insig
    live behind one destination, each with its own URL. */
 const MENU_TAB_PATHS = {items:'/admin/menu',design:'/admin/menu/design',promotions:'/admin/menu/promotions'};
 const MENU_TABS = [['items','Items'],['design','Design'],['promotions','Promotions']];
-/* Settings and Insights are one screen each, split by tabs instead of rows
-   that only navigate. The tab is remembered in ui, never in the URL. */
+/* Settings uses one shared screen, with the URL selecting its active tab.
+   Insights remains a local view because its segments are reporting filters. */
 const SETTINGS_TABS = [['restaurant','Restaurant'],['team','Team'],['billing','Billing']];
 const INSIGHT_TABS = [['traffic','Traffic'],['dishes','Dishes'],['guests','Guests']];
-function settingsTab(){ return SETTINGS_TABS.some(t=>t[0]===ui.settingsTab) ? ui.settingsTab : 'restaurant'; }
+function settingsTab(){ return SETTINGS_TABS.some(t=>t[0]===state.adminSubpage) ? state.adminSubpage : 'restaurant'; }
 function insightsTab(){ return INSIGHT_TABS.some(t=>t[0]===ui.insightsTab) ? ui.insightsTab : 'traffic'; }
 /* Embedded pages keep their body but lose their own back-row / page-head,
    because the hosting screen already provides one. */
@@ -1575,7 +1575,8 @@ function renderRestaurantAdmin(){
  const ctx = opsCtx();
  const tabKey = TAB_ACCESS[state.adminTab];
  let page;
- if(state.adminSubpage) page = renderAdminSubpage(state.adminSubpage);
+ if(state.adminSubpage && ADMIN_SUBPAGES[state.adminSubpage].tab==='settings') page = adminSettingsHub();
+ else if(state.adminSubpage) page = renderAdminSubpage(state.adminSubpage);
  else if(!canAccess(tabKey)) page = noPermissionPage(tabKey);
  else page = ({home:adminHome,menu:adminMenu,promote:adminPromote,insights:analyticsPage,settings:adminSettingsHub}[state.adminTab]||adminHome)(ctx);
  return `<div class="content-scroll"><main class="admin-main">${page}</main></div>${adminNav()}`;
@@ -1768,9 +1769,6 @@ function renderAdminSubpage(page){
  const key = SUBPAGE_ACCESS[page];
  if(!canAccess(key)) return `${subHead(ADMIN_SUBPAGE_TITLES[page]||'Restricted','Settings')}${noPermissionPage(key)}`;
  if(page==='qr') return adminQr();
- if(page==='billing') return billingPage();
- if(page==='team') return HapOps.adminPages.staff(opsCtx());
- if(page==='restaurant') return HapOps.adminSubpages.opsSettings(opsCtx());
  return adminSettingsHub();
 }
 
@@ -2810,8 +2808,8 @@ app.addEventListener('click',e=>{
  if(a==='toggle-open'){ state.restaurant.status=state.restaurant.status==='Open'?'Closed':'Open'; save(); toast(state.restaurant.status==='Open'?'Open now':'Closed now'); render(); return; }
  if(a==='toggle-hide-soldout'){ state.hideSoldOut=!state.hideSoldOut; save(); render(); return; }
   if(a==='menu-filter'){ ui.menuFilter=btn.dataset.filter; render(); return; }
- /* Tabs and the density toggle only change what is drawn, never the data. */
- if(a==='settings-tab'){ ui.settingsTab=btn.dataset.tab; render(); return; }
+ /* Settings tabs are routes; reporting tabs and density only change the view. */
+ if(a==='settings-tab'){ const tab=btn.dataset.tab; if(ADMIN_SUBPAGES[tab]?.tab!=='settings') return; state.adminTab='settings'; state.adminSubpage=tab; save(); render(); return; }
  if(a==='insights-tab'){ ui.insightsTab=btn.dataset.tab; render(); return; }
  if(a==='items-density'){ ui.itemsGrid=ui.itemsGrid==='grid'?'list':'grid'; render(); return; }
  if(a==='jump-category'){ const id=btn.dataset.id; ui.expandedCategory=id; render(); requestAnimationFrame(()=>{ const node=document.getElementById(`cat-${id}`); if(node) node.scrollIntoView({block:'start',behavior:preferredScrollBehavior()}); }); return; }
