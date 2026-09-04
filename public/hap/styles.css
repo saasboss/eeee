@@ -343,7 +343,7 @@ svg{display:block}
 .kpi .stat-delta.down{color:var(--danger)}
 
 .list-card{overflow:hidden}
-.data-row{width:100%;padding:13px 14px;display:flex;align-items:center;gap:11px;text-align:left;color:inherit;background:none;transition:background .16s var(--ease)}
+.data-row{width:100%;min-height:44px;padding:13px 14px;display:flex;align-items:center;gap:11px;text-align:left;color:inherit;background:none;transition:background .16s var(--ease)}
 .list-card>*+*{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
 .data-row:hover{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .data-row>svg{color:var(--subtle);flex:none}
@@ -377,14 +377,14 @@ svg{display:block}
 
 .form-card{padding:15px;display:grid;gap:13px}
 .form-card .btn.full{margin-top:2px}
-.inline-input{width:100%;max-width:150px;min-height:38px;padding:0 11px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);font-size:12.5px;font-weight:700;text-align:right}
+.inline-input{width:100%;max-width:150px;min-height:44px;padding:0 11px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);font-size:12.5px;font-weight:700;text-align:right}
 .inline-input:focus{border-color:var(--brand);background:var(--surface)}
 .system-row .inline-input{margin-left:auto}
 
 .chip-wrap{display:flex;flex-wrap:wrap;gap:7px;padding:14px}
 .card>.chip-wrap{padding:14px}
 .form-grid .chip-wrap{padding:0}
-.soft-chip{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:11.5px;font-weight:800;color:var(--text)}
+.soft-chip{display:inline-flex;align-items:center;gap:5px;min-height:44px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:11.5px;font-weight:800;color:var(--text)}
 .soft-chip.removable{color:var(--muted)}
 .soft-chip.removable svg{color:var(--subtle)}
 .soft-chip.removable:hover{border-color:color-mix(in srgb,var(--danger) 45%,var(--line));color:var(--danger)}
@@ -406,6 +406,8 @@ svg{display:block}
 .super-shell .empty-orb,.super-shell .soft-chip,.super-shell .inline-input,.super-shell .status-pill.tone-neutral{background:#232b37;border-color:#2a3340;color:#eaf0f7}
 .super-shell .kpi .stat-delta.up{color:#7cc498}
 .super-shell .inline-input:focus{border-color:#75a7ff}
+.super-shell .section-link,.super-shell .link-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.super-shell .btn.small{min-height:44px}
 .super-shell .status-pill.tone-ok{background:#22342c;color:#7cc498}
 .super-shell .status-pill.tone-warn{background:#3a3222;color:#d8b071}
 .super-shell .status-pill.tone-bad{background:#3a2626;color:#e08b82}
