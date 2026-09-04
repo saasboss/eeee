@@ -266,6 +266,7 @@ function statusField(current){
 
 
 function icon(name,size=20){ return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||ICONS.more}</svg>`; }
+function preferredScrollBehavior(){ return window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'; }
 
 const languages = [
  ['EN','English','English'],['SQ','Shqip','Albanian'],['IT','Italiano','Italian'],['DE','Deutsch','German'],['FR','Français','French'],['ES','Español','Spanish'],['EL','Ελληνικά','Greek'],['PT','Português','Portuguese'],['NL','Nederlands','Dutch'],['PL','Polski','Polish'],['TR','Türkçe','Turkish'],['RO','Română','Romanian'],['SR','Srpski','Serbian'],['HR','Hrvatski','Croatian'],['UK','Українська','Ukrainian'],['SV','Svenska','Swedish'],['NO','Norsk','Norwegian'],['DA','Dansk','Danish'],['CS','Čeština','Czech'],['JA','日本語','Japanese'],['ZH','中文','Chinese'],['KO','한국어','Korean'],['AR','العربية','Arabic']
@@ -1449,6 +1450,7 @@ function startLandingDemo(){
 
  function run(){
   if(h.stopped||h.paused) return;
+  if(reduce){ apply(steps[0]); return; }
   const step=steps[h.idx];
   apply(step);
   h.timer=setTimeout(()=>{ h.idx=(h.idx+1)%steps.length; run(); }, reduce ? Math.max(step.hold,1400)*1.35 : step.hold);
@@ -1581,7 +1583,7 @@ function adminNav(){
   ? [['overview','home','Overview'],['restaurants','building','Restaurants'],['users','users','Users'],['plans','chart','Plans'],['settings','settings','Settings']]
   : [['home','home','Overview'],['menu','menu','Menu'],['insights','chart','Insights'],['settings','settings','Settings']];
  const activeTab = state.role==='super' ? state.adminTab : (state.adminSubpage ? ADMIN_SUBPAGES[state.adminSubpage].tab : state.adminTab);
- return `<nav class="admin-bottom-nav">${tabs.map(([id,ic,label])=>`<button class="admin-nav-btn ${activeTab===id?'active':''}" data-action="${state.role==='super'?'super-tab':'admin-tab'}" data-tab="${id}" data-tour="nav-${id}">${icon(ic,21)}<span>${label}</span></button>`).join('')}</nav>`;
+ return `<nav class="admin-bottom-nav" aria-label="${state.role==='super'?'Hap Control':'Restaurant admin'}">${tabs.map(([id,ic,label])=>`<button class="admin-nav-btn ${activeTab===id?'active':''}" data-action="${state.role==='super'?'super-tab':'admin-tab'}" data-tab="${id}" data-tour="nav-${id}"${activeTab===id?' aria-current="page"':''}>${icon(ic,21)}<span>${label}</span></button>`).join('')}</nav>`;
 }
 /* Reads go through the service boundary, which resolves permission and
    empty states once instead of per screen. */
@@ -1620,8 +1622,8 @@ function adminHome(){
   <button class="card quick" data-action="bulk-price"><div class="quick-icon">${icon('edit',18)}</div><div><strong>Update prices</strong><span>Every dish, inline</span></div></button>
  </div></section>
  <section class="section"><div class="section-row"><div class="section-title">Service controls</div></div><div class="settings-list">
-  <div class="card settings-row"><div class="settings-icon">${icon('clock',18)}</div><div class="settings-copy"><strong>${state.restaurant.status==='Open'?'Open now':'Closed'}</strong><span>Shown at the top of the public menu</span></div><button class="switch ${state.restaurant.status==='Open'?'on':''}" data-action="toggle-open"><i></i></button></div>
-  <div class="card settings-row"><div class="settings-icon">${icon('eyeOff',18)}</div><div class="settings-copy"><strong>Hide sold-out dishes</strong><span>Remove them instead of greying them out</span></div><button class="switch ${state.hideSoldOut?'on':''}" data-action="toggle-hide-soldout"><i></i></button></div>
+  <div class="card settings-row"><div class="settings-icon">${icon('clock',18)}</div><div class="settings-copy"><strong>${state.restaurant.status==='Open'?'Open now':'Closed'}</strong><span>Shown at the top of the public menu</span></div><button class="switch ${state.restaurant.status==='Open'?'on':''}" role="switch" aria-checked="${state.restaurant.status==='Open'}" aria-label="Restaurant open" data-action="toggle-open"><i></i></button></div>
+  <div class="card settings-row"><div class="settings-icon">${icon('eyeOff',18)}</div><div class="settings-copy"><strong>Hide sold-out dishes</strong><span>Remove them instead of greying them out</span></div><button class="switch ${state.hideSoldOut?'on':''}" role="switch" aria-checked="${!!state.hideSoldOut}" aria-label="Hide sold-out dishes" data-action="toggle-hide-soldout"><i></i></button></div>
  </div></section>
  <section class="section"><div class="section-row"><div class="section-title">Tonight</div><button class="section-link" data-action="admin-tab" data-tab="insights">View insights</button></div><div class="tonight-list">
   <button class="card signal-row" data-action="menu-tab" data-tab="promotions"><div class="signal-icon">${icon('spark',17)}</div><div class="signal-copy"><strong>${promoted?escapeHtml(promoted.item.name):'No active promotion'}</strong><span>${promoted?`${escapeHtml(promoted.item.promotion.label)} · ${escapeHtml(promoted.item.promotion.intensity)}`:'Choose an item to feature'}</span></div><div class="signal-value">${promoted?'1':'0'}</div>${icon('chevron',15)}</button>
@@ -1634,14 +1636,14 @@ function adminHome(){
    menu, and the promotions running on it. */
 function menuTabBar(){
  const active=menuTab();
- return `<div class="segment-control menu-tabbar">${MENU_TABS.map(([id,label])=>`<button class="${active===id?'active':''}" data-action="menu-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
+ return `<div class="segment-control menu-tabbar" role="tablist" aria-label="Menu sections">${MENU_TABS.map(([id,label])=>`<button id="menu-tab-${id}" class="${active===id?'active':''}" role="tab" aria-selected="${active===id}" aria-controls="menu-panel-${id}" data-action="menu-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
 }
 function adminMenu(){
  const tab=menuTab();
  const body = tab==='design' ? (canAccess('design')?appearancePage():noPermissionPage('design'))
   : tab==='promotions' ? adminPromote()
   : adminMenuItems();
- return `${menuTabBar()}${body}`;
+ return `${menuTabBar()}<div id="menu-panel-${tab}" role="tabpanel" aria-labelledby="menu-tab-${tab}">${body}</div>`;
 }
 function adminMenuItems(){
  const q=(ui.adminSearch||'').trim().toLowerCase();
@@ -1725,8 +1727,8 @@ function adminPromote(){
  <button class="btn primary full" style="margin-bottom:12px" data-action="promo-chooser">${icon('plus',16)} New promotion</button>
  ${ui.promoError?`<div class="promo-warn">${escapeHtml(ui.promoError)}</div>`:''}
  ${itemCount>3?`<div class="promo-warn">${itemCount} promotions active — the menu stops feeling special.</div>`:''}
- <div class="segment-control" style="margin-bottom:12px">${PROMO_SEGMENTS.map(([id,label])=>`<button class="${segment===id?'active':''}" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
- ${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}
+ <div class="segment-control" role="tablist" aria-label="Promotion status" style="margin-bottom:12px">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel-${id}" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
+ <div id="promotions-panel-${segment}" role="tabpanel" aria-labelledby="promotions-tab-${segment}">${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
  <section class="section"><div class="section-row"><div><div class="section-title">How promotions read</div><div class="page-subtitle">Five compositions. Each one keeps the price protected.</div></div></div><div class="settings-list">${PROMO_STYLES.map(([id,n,desc])=>`<div class="card settings-row"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(desc)}</span></div></div>`).join('')}</div></section>`;
 
 }
@@ -1748,8 +1750,8 @@ function adminSettingsHub(){
   : tab==='billing' ? (canAccess(SUBPAGE_ACCESS.billing)?stripHeads(billingPage()):noPermissionPage(SUBPAGE_ACCESS.billing))
   : (canAccess(SUBPAGE_ACCESS.restaurant)?stripHeads(HapOps.adminSubpages.opsSettings(ctx)):noPermissionPage(SUBPAGE_ACCESS.restaurant));
  return `<div class="page-head"><div><div class="eyebrow">Restaurant controls</div><h1 class="page-title">Settings</h1><p class="page-subtitle">Everything else, without turning into a settings maze.</p></div></div>
- <div class="segment-control settings-tabbar">${SETTINGS_TABS.map(([id,label])=>`<button class="${tab===id?'active':''}" data-action="settings-tab" data-tab="${id}" aria-pressed="${tab===id}">${label}</button>`).join('')}</div>
- ${body}
+ <div class="segment-control settings-tabbar" role="tablist" aria-label="Settings sections">${SETTINGS_TABS.map(([id,label])=>`<button id="settings-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="settings-panel-${id}" data-action="settings-tab" data-tab="${id}">${label}</button>`).join('')}</div>
+ <div id="settings-panel-${tab}" role="tabpanel" aria-labelledby="settings-tab-${tab}">${body}</div>
  <section class="section"><div class="section-row"><div class="section-title">Appearance</div></div><div class="settings-list">
   <button class="card settings-row" data-action="menu-tab" data-tab="design"><div class="settings-icon">${icon('palette',18)}</div><div class="settings-copy"><strong>Menu design</strong><span>Template, palette and background</span></div>${icon('chevron',17)}</button>
  </div></section>
@@ -1771,7 +1773,7 @@ function renderAdminSubpage(page){
 }
 
 const ADMIN_SUBPAGE_TITLES = {qr:'QR code',appearance:'Appearance',billing:'Billing',team:'Team',restaurant:'Restaurant'};
-function subHead(title,eyebrow=''){ return `<div class="back-row"><button data-action="subpage-back">${icon('back',18)}</button><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><strong>${escapeHtml(title)}</strong></div></div>`; }
+function subHead(title,eyebrow=''){ return `<div class="back-row"><button data-action="subpage-back" aria-label="Go back">${icon('back',18)}</button><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><strong>${escapeHtml(title)}</strong></div></div>`; }
 /* Live miniature: the real guest-menu renderer drawn at full mobile width
    (390px) inside each card, then shrunk with transform: scale(). No fake
    skeleton — the card shows the actual template with real dishes. */
@@ -1823,7 +1825,7 @@ function selectTemplateCard(id){
  refreshPaletteRow();
  refreshBackgroundCards();
  requestAnimationFrame(()=>{
-  strip.querySelector('.preset.selected')?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  strip.querySelector('.preset.selected')?.scrollIntoView({behavior:preferredScrollBehavior(),block:'nearest',inline:'center'});
  });
 }
 /* Shared in-place picker mechanics: no render(), so scroll and focus survive. */
@@ -1977,7 +1979,7 @@ function analyticsPage(){
   : `<div class="page-head"><div><div class="eyebrow">${range==='all'?'All time':'Last '+(INSIGHT_RANGES.find(r=>r[0]===range)||[,'7 days'])[1]}</div><h1 class="page-title">Insights</h1><p class="page-subtitle">What guests actually did on your menu</p></div></div>`;
  const ranges=`<div class="range-chips" role="group" aria-label="Date range">${INSIGHT_RANGES.map(([id,label])=>`<button class="filter-chip ${range===id?'active':''}" data-action="insights-range" data-range="${id}" aria-pressed="${range===id}">${label}</button>`).join('')}</div>`;
  const tab=insightsTab();
- const tabbar=`<div class="segment-control insights-tabbar">${INSIGHT_TABS.map(([id,label])=>`<button class="${tab===id?'active':''}" data-action="insights-tab" data-tab="${id}" aria-pressed="${tab===id}">${label}</button>`).join('')}</div>`;
+ const tabbar=`<div class="segment-control insights-tabbar" role="tablist" aria-label="Insight sections">${INSIGHT_TABS.map(([id,label])=>`<button id="insights-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="insights-panel-${id}" data-action="insights-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
  if(res.status==='denied') return `${head}${noPermissionPage('menu')}`;
  if(res.status!=='ok'||!events.length){
   return `${head}${ranges}
@@ -1998,7 +2000,7 @@ function analyticsPage(){
  const guests = `<section class="section"><div class="section-title" style="margin-bottom:10px">Guest languages</div><div class="card bar-list">${bars(langRows.map(([n,c,pct])=>[n,c,pct]))}</div></section>
  <section class="section"><div class="section-title" style="margin-bottom:10px">Filters used</div><div class="card bar-list">${bars([...(s.dietFilters||[]).map(([d,n])=>[dietLabel(d),n,100]),...(s.allergenFilters||[]).map(([c,n])=>[allergenFull(c),n,100])].map((r,_,arr)=>{const max=Math.max(...arr.map(x=>x[1]));return [r[0],r[1],Math.round(r[1]/max*100)];}))}</div></section>`;
  return `${head}${tabbar}${ranges}
- ${tab==='dishes'?dishes:tab==='guests'?guests:traffic}
+ <div id="insights-panel-${tab}" role="tabpanel" aria-labelledby="insights-tab-${tab}">${tab==='dishes'?dishes:tab==='guests'?guests:traffic}</div>
  <p class="fx-note">Counts come only from guest sessions on your public menu. Owner previews are excluded.</p>`;
 }
 
@@ -2239,7 +2241,7 @@ function renderSuperadmin(){
 }
 function superNav(){
  const tabs=[['overview','home','Overview'],['restaurants','building','Restaurants'],['users','users','Users'],['plans','chart','Plans'],['settings','settings','Settings']];
- return `<nav class="admin-bottom-nav">${tabs.map(([id,ic,label])=>`<button class="admin-nav-btn ${state.adminTab===id&&!state.adminSubpage?'active':''}" data-action="super-tab" data-tab="${id}" data-tour="nav-${id}">${icon(ic,21)}<span>${label}</span></button>`).join('')}</nav>`;
+ return `<nav class="admin-bottom-nav" aria-label="Hap Control">${tabs.map(([id,ic,label])=>{const active=state.adminTab===id&&!state.adminSubpage;return `<button class="admin-nav-btn ${active?'active':''}" data-action="super-tab" data-tab="${id}" data-tour="nav-${id}"${active?' aria-current="page"':''}>${icon(ic,21)}<span>${label}</span></button>`;}).join('')}</nav>`;
 }
 
 function renderOverlays(){
@@ -2283,7 +2285,7 @@ function currencySheet(){
   `<div class="fx-list">${list.map(x=>`<div class="fx-row"><div class="fx-row-copy"><strong>${x.code}</strong><span>${escapeHtml(CURRENCIES[x.code].name)}</span></div><div class="fx-row-value">${formatCurrency(x.value,x.code)}</div></div>`).join('')||`<div class="empty-inline">No conversions configured.</div>`}</div>
   <p class="fx-note">Reference conversions set by the restaurant. The price you pay is ${money(f.item.price)}.</p>`);
 }
-function sheetShell(title,sub,body){ return `<section class="sheet" role="dialog" aria-modal="true"><div class="sheet-handle"></div><div class="sheet-head"><div><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div><button class="close-btn" data-action="close-sheet">${icon('close',18)}</button></div>${body}</section>`; }
+function sheetShell(title,sub,body){ return `<section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"${sub?' aria-describedby="sheet-description"':''}><div class="sheet-handle"></div><div class="sheet-head"><div><h2 id="sheet-title">${title}</h2>${sub?`<p id="sheet-description">${sub}</p>`:''}</div><button class="close-btn" data-action="close-sheet" aria-label="Close dialog">${icon('close',18)}</button></div>${body}</section>`; }
 /* Persistent language affordance in the sticky toolbar: the guest can see
    which language they are reading and change it without scrolling back to
    the banner. Hidden when the menu is published in one language only. */
@@ -2516,11 +2518,11 @@ function restaurantDetailSheet(){
 }
 function renderSpecialModal(){
  const p=getPromoted(); if(!p) return '';
- return `<div class="overlay"></div><div class="special-modal"><button class="close-btn" style="position:absolute;right:14px;top:14px" data-action="close-modal">${icon('close',18)}</button><span class="modal-badge">${icon('spark',13)} ${escapeHtml(p.item.promotion.label)}</span><h2>${escapeHtml(p.item.name)}</h2><p>Something worth noticing — just for tonight.</p><div class="modal-media"><img src="${absoluteAsset(p.item.image)}" alt="${escapeHtml(p.item.name)}" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')"></div><p>${escapeHtml(itemIngredients(p.item))}</p><div class="price">${itemPriceLabel(p.item)}</div><button class="btn primary full" data-action="view-special" data-id="${p.item.id}">View on menu ${icon('chevron',15)}</button><button class="btn full" style="margin-top:7px" data-action="close-modal">Maybe later</button></div>`;
+ return `<div class="overlay"></div><div class="special-modal" role="dialog" aria-modal="true" aria-labelledby="special-modal-title"><button class="close-btn" style="position:absolute;right:14px;top:14px" data-action="close-modal" aria-label="Close promotion">${icon('close',18)}</button><span class="modal-badge">${icon('spark',13)} ${escapeHtml(p.item.promotion.label)}</span><h2 id="special-modal-title">${escapeHtml(p.item.name)}</h2><p>Something worth noticing — just for tonight.</p><div class="modal-media"><img src="${absoluteAsset(p.item.image)}" alt="${escapeHtml(p.item.name)}" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')"></div><p>${escapeHtml(itemIngredients(p.item))}</p><div class="price">${itemPriceLabel(p.item)}</div><button class="btn primary full" data-action="view-special" data-id="${p.item.id}">View on menu ${icon('chevron',15)}</button><button class="btn full" style="margin-top:7px" data-action="close-modal">Maybe later</button></div>`;
 }
 function renderConfirmModal(){
  const c=ui.confirm;
- return `<div class="overlay" data-action="confirm-cancel"></div><div class="confirm-modal" role="dialog" aria-modal="true"><strong>${escapeHtml(c.title)}</strong><p>${escapeHtml(c.body)}</p><div class="confirm-actions"><button class="btn" data-action="confirm-cancel">Cancel</button><button class="btn ${c.tone==='danger'?'danger':'primary'} full" data-action="confirm-action">${escapeHtml(c.label)}</button></div></div>`;
+ return `<div class="overlay" data-action="confirm-cancel"></div><div class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-description"><strong id="confirm-title">${escapeHtml(c.title)}</strong><p id="confirm-description">${escapeHtml(c.body)}</p><div class="confirm-actions"><button class="btn" data-action="confirm-cancel">Cancel</button><button class="btn ${c.tone==='danger'?'danger':'primary'} full" data-action="confirm-action">${escapeHtml(c.label)}</button></div></div>`;
 }
 
 function postRender(){
@@ -2601,8 +2603,8 @@ function setupCategoryPagers(){
   },{passive:true});
  });
 }
-function setActiveCategory(id){ document.querySelectorAll('.category-chip').forEach(b=>b.classList.toggle('active',b.dataset.id===id)); const active=document.querySelector(`.category-chip[data-id="${CSS.escape(id)}"]`); const strip=document.getElementById('category-strip'); if(active&&strip){ const left=active.offsetLeft-(strip.clientWidth-active.offsetWidth)/2; strip.scrollTo({left:Math.max(0,left),behavior:'smooth'}); } }
-function scrollToCategory(id){ const scroller=document.getElementById('public-scroll'); const target=document.getElementById(`cat-${id}`); const sticky=document.getElementById('category-sticky'); if(!scroller||!target)return; const top=target.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop-(sticky?.offsetHeight||0)-4; scroller.scrollTo({top:Math.max(0,top),behavior:'smooth'}); }
+function setActiveCategory(id){ document.querySelectorAll('.category-chip').forEach(b=>b.classList.toggle('active',b.dataset.id===id)); const active=document.querySelector(`.category-chip[data-id="${CSS.escape(id)}"]`); const strip=document.getElementById('category-strip'); if(active&&strip){ const left=active.offsetLeft-(strip.clientWidth-active.offsetWidth)/2; strip.scrollTo({left:Math.max(0,left),behavior:preferredScrollBehavior()}); } }
+function scrollToCategory(id){ const scroller=document.getElementById('public-scroll'); const target=document.getElementById(`cat-${id}`); const sticky=document.getElementById('category-sticky'); if(!scroller||!target)return; const top=target.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop-(sticky?.offsetHeight||0)-4; scroller.scrollTo({top:Math.max(0,top),behavior:preferredScrollBehavior()}); }
 function filterPublicItems(q){ const t=q.trim().toLowerCase(); document.querySelectorAll('.menu-product').forEach(el=>el.style.display=!t||el.dataset.search.includes(t)?'':'none'); document.querySelectorAll('.menu-category').forEach(sec=>{ const any=[...sec.querySelectorAll('.menu-product')].some(el=>el.style.display!=='none'); sec.style.display=any?'':'none'; }); }
 function tourStep(){ return TOUR_STEPS[Math.min(state.tour.step,TOUR_STEPS.length-1)]; }
 function applyTourNav(i){
@@ -2790,9 +2792,9 @@ app.addEventListener('click',e=>{
  if(a==='close-sheet'){ ui.sheet=null; ui.sheetData=null; render(); return; }
  if(a==='select-language'){ state.preview.language=btn.dataset.lang; state.preview.languageConfirmed=true; ui.sheet=null; track('language_change',{lang:btn.dataset.lang}); save(); render(); if(!state.preview.promoSeen&&getPromoted()){ setTimeout(()=>{ui.modal='special';state.preview.promoSeen=true;save();render();},1400);} return; }
  if(a==='close-modal'){ ui.modal=null; state.preview.promoSeen=true; save(); render(); return; }
- if(a==='view-special'){ const id=btn.dataset.id; ui.modal=null; render(); setTimeout(()=>document.querySelector(`[data-item-id="${CSS.escape(id)}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}),80); return; }
+ if(a==='view-special'){ const id=btn.dataset.id; ui.modal=null; render(); setTimeout(()=>document.querySelector(`[data-item-id="${CSS.escape(id)}"]`)?.scrollIntoView({behavior:preferredScrollBehavior(),block:'center'}),80); return; }
  if(a==='jump-category'){ setActiveCategory(btn.dataset.id); scrollToCategory(btn.dataset.id); track('category_expand',{id:btn.dataset.id}); return; }
- if(a==='scroll-item'){ document.querySelector(`[data-item-id="${CSS.escape(btn.dataset.id)}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+ if(a==='scroll-item'){ document.querySelector(`[data-item-id="${CSS.escape(btn.dataset.id)}"]`)?.scrollIntoView({behavior:preferredScrollBehavior(),block:'center'}); return; }
  if(a==='reset-demo'){ showConfirm({title:'Reset all prototype changes?',body:'This restores the original Sofra demo and clears any edits you made.',label:'Reset demo',tone:'danger',run(){ Data.restaurants.remove(ACTIVE_SLUG); state=defaultState(); ui={sheet:null,sheetData:null,modal:null,expandedCategory:'popular',menuSearch:'',superSearch:'',languageSearch:'',editingItem:null,adminSearch:'',menuFilter:'all',superFilter:'all',userFilter:'all',subId:null,userSearch:'',confirm:null,skeleton:false,lastFocus:null}; save(); toast('Demo restored'); render(); }}); return; }
  if(a==='replay-onboarding'||a==='tour-start'){ startTour(); return; }
  if(a==='new-customer'){ state.preview.languageConfirmed=false; state.preview.promoSeen=false; state.preview.strongDismissed=false; state.mode='preview'; ui.sheet=null;ui.modal=null;save();render();return; }
@@ -2810,7 +2812,7 @@ app.addEventListener('click',e=>{
  if(a==='settings-tab'){ ui.settingsTab=btn.dataset.tab; render(); return; }
  if(a==='insights-tab'){ ui.insightsTab=btn.dataset.tab; render(); return; }
  if(a==='items-density'){ ui.itemsGrid=ui.itemsGrid==='grid'?'list':'grid'; render(); return; }
- if(a==='jump-category'){ const id=btn.dataset.id; ui.expandedCategory=id; render(); requestAnimationFrame(()=>{ const node=document.getElementById(`cat-${id}`); if(node) node.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }); return; }
+ if(a==='jump-category'){ const id=btn.dataset.id; ui.expandedCategory=id; render(); requestAnimationFrame(()=>{ const node=document.getElementById(`cat-${id}`); if(node) node.scrollIntoView({block:'start',behavior:preferredScrollBehavior()}); }); return; }
  if(a==='item-soldout'||a==='item-hidden'){
   const f=getItem(btn.dataset.id); if(!f) return;
   const target=a==='item-soldout'?'soldout':'hidden';
