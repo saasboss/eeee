@@ -6,6 +6,13 @@
  * TanStack routes (for not-found handling) and by the application's own router.
  */
 
+/** Settings tabs are addressable screens so refresh and browser history preserve selection. */
+export const ADMIN_SETTINGS_SCREENS = [
+  "settings/restaurant",
+  "settings/team",
+  "settings/billing",
+] as const;
+
 /** Canonical admin screens, relative to /admin. "" is the Overview tab. */
 export const ADMIN_SCREENS = [
   "menu",
@@ -14,9 +21,7 @@ export const ADMIN_SCREENS = [
   "menu/promotions",
   "insights",
   "settings",
-  "settings/restaurant",
-  "settings/team",
-  "settings/billing",
+  ...ADMIN_SETTINGS_SCREENS,
 ] as const;
 
 /** Old URLs kept alive: they resolve to a canonical screen instead of 404. */
