@@ -1,6 +1,6 @@
 # Phase 1 — UI/UX, information architecture, action hierarchy and visual polish
 
-Plan only. Nothing here is implemented. `docs/PROJECT_STATE.md` is the single source for Now / Next / Later / Done / decisions; this file is the detailed implementation plan. No second roadmap file is created or maintained.
+This is the detailed implementation plan. Task 1 was merged in [PR #3](https://github.com/saasboss/eeee/pull/3). Task 2 corrects this plan and `README.md` so both match current `main`; application changes begin with Task 3. `docs/PROJECT_STATE.md` remains the single source for Now / Next / Later / Done / decisions. No second roadmap file is created or maintained.
 
 ## 1. Corrected current-state baseline (verified)
 
@@ -77,8 +77,8 @@ Every screen-specific task (Overview, Menu Items, Design, QR, Promotions, Insigh
 
 Every task: **scope · files · classification · acceptance · regression · rollback · excluded**.
 
-1. **PROJECT_STATE Now** — docs. `docs/PROJECT_STATE.md` only. Accept: Phase 1 is the approved Now item and Phase 2 desktop/tablet is in Later/deferred. No other file changes. Rollback: revert doc.
-2. **Baseline correction** — docs. `.lovable/plan.md`, `README.md` where stale. Accept: no claim contradicts main. Excluded: app code.
+1. **PROJECT_STATE Now — completed in PR #3** — docs. `docs/PROJECT_STATE.md` only. Accept: Phase 1 is the approved Now item and Phase 2 desktop/tablet is in Later/deferred. No other file changes. Rollback: revert doc.
+2. **Baseline correction — completed by this documentation PR** — docs. `.lovable/plan.md`, `README.md` where stale. Accept: no claim contradicts main. Excluded: app code.
 3. **Accessibility A — semantics and focus** — `app.js`, `ops.js`, `styles.css`. Accept: accessible names on every icon-only Back/Close; `role="switch"` + `aria-checked` on Overview service switches; `aria-current="page"` on bottom nav; correct tab vs link semantics with `role="tablist"/"tab"/"tabpanel"` and `aria-controls`; `aria-labelledby` on sheets, dialogs and confirmations; `.inline-input:focus{outline:none}` conflict removed so inline inputs show a visible ring; `prefers-reduced-motion` respected. Regression: no layout shift at 320px. Rollback: revert the attribute/CSS commit. Excluded: sizing, layout.
 4. **Accessibility B1 — target sizing: restaurant navigation and common controls** — bottom nav, page-header buttons, back/close, dialog and tour controls. Accept: ≥44px effective; no overflow at 320px. Rollback: revert CSS commit.
 5. **Accessibility B2 — target sizing: Menu controls** — category chips, `.item-action`, density buttons, quick pills, `.rate-tools .mini-icon` (currently 28px). Same acceptance and rollback.
@@ -114,6 +114,6 @@ Desktop/tablet admin layout (Phase 2); auth, roles and tenancy; Hap Control rede
 
 Screens: guest menu, Overview, Menu Items, Design, Promotions, QR, Insights, Settings ×3 tabs, Hap Control. Widths: 320 / 390 / 430 px, plus ≥700px only to confirm no regression of the framed presentation. Per screen: zero console errors; zero horizontal overflow; one primary action; all §5 targets ≥44px; visible focus on every control including inline inputs; keyboard-only traversal; SR names on icon-only controls; deep link + refresh + Back/Forward per route; destructive confirm and Undo still work; light and dark; reduced motion; 200% zoom; safe-area insets; 8px spacing rhythm and single page-header structure honoured; visual acceptance criteria of the owning task met.
 
-## 9. Proposed `docs/PROJECT_STATE.md` Now section
+## 9. Recorded `docs/PROJECT_STATE.md` priority
 
-> **Now — one current priority:** Phase 1 — UI/UX, information architecture, action hierarchy and visual polish of the existing Hap prototype. Mobile-first at 320/390/430px; ≥700px checked only for no regression. Visual work covers positioning, alignment, hierarchy, density, spacing on an 8px scale, one page-header structure, and removal of wasted space and redundant containers — without a global CSS rewrite. No changes to authentication, data, payments, dependencies or business logic. Delivered as the numbered tasks in `.lovable/plan.md`, one branch and pull request each, independently reviewable and revertible. Desktop/tablet admin layout is deferred to Phase 2.
+PR #3 recorded the approved Phase 1 priority in `docs/PROJECT_STATE.md`. The true desktop/tablet administration layout is recorded separately under Later/deferred.
