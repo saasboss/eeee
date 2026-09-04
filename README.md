@@ -1,83 +1,83 @@
-# v55
+# Hap
 
-This is a TanStack Start (TanStack Router + React 19 + Vite + Tailwind v4 + shadcn/ui) project for **Hap** — a digital restaurant menu SaaS prototype. Here is an exact description of what exists and what the current state is. Do NOT regenerate or overwrite existing code unless I ask.
+Hap is a mobile-first digital restaurant menu and administration prototype. The current work is **Phase 1: UI/UX, information architecture, action hierarchy, accessibility, and visual polish** of the existing prototype.
 
----
+For the approved scope and implementation order, read:
 
-## Tech stack
-- TanStack Start (file-based routing via `src/routes/`)
-- React 19, TypeScript, Vite
-- Tailwind CSS v4 with `@theme inline` design tokens (oklch color system)
-- shadcn/ui components (all installed in `src/components/ui/`)
-- `vaul` for mobile bottom drawers
-- `@lovable.dev/vite-tanstack-config` as the Vite config wrapper
-- Template: `tanstack_start_ts_current`
+- [`AGENTS.md`](AGENTS.md) — mandatory rules for every coding agent
+- [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) — product state and current priority
+- [`.lovable/plan.md`](.lovable/plan.md) — detailed Phase 1 plan
+- [`docs/AI_WORK_LOG.md`](docs/AI_WORK_LOG.md) — coordination between Codex, Claude, Lovable, and other agents
 
-## Brand / design system
-- Custom `--brand` color: `oklch(0.62 0.19 45)` (warm amber/orange) in light mode, `oklch(0.7 0.16 45)` in dark
-- `--brand-foreground` and `--brand-subtle` tokens defined in `src/styles.css`
-- Full dark mode support via `.dark` class toggled on `<html>`
-- All colors in oklch; radius base is `0.625rem`
+## Current architecture
 
-## Routes (3 files in `src/routes/`)
+- TanStack Start and TanStack Router
+- React 19 and TypeScript
+- Vite and Tailwind CSS v4
+- shadcn/ui and Radix UI components
+- The restaurant interface is implemented in `public/hap/`
+- `src/components/hap-app.tsx` mounts that interface directly into the host document; it does **not** use an iframe
+- GitHub `main` is the shared source of truth and synchronizes with the connected Lovable project
 
-### 1. `/` → `src/routes/index.tsx`
-Renders a full-screen `<iframe src="/hap/index.html">` — this serves the static HTML/JS prototype that lives in `public/hap/`. The iframe is the landing experience; it is intentional.
+This repository is currently a prototype. Do not assume that authentication, production data, payments, analytics, billing, roles, or tenancy are complete merely because their screens or demo states exist.
 
-### 2. `/menu/$slug` → `src/routes/menu.$slug.tsx`
-The fully implemented **guest-facing digital menu** page. Contains everything in one large file:
-- `MenuPage` component (main orchestrator)
-- `Header` — hero gradient banner, restaurant name ("Sofra"), dark mode toggle, large text toggle, language switcher (EN/SQ/FR/DE/IT)
-- `MenuTypeTabs` — horizontal scroll tabs: Breakfast / Lunch / Dinner / All Day / Drinks
-- `CategoryTabs` — sub-categories per menu type (e.g. Starters / Mains / Desserts)
-- Search bar (full-width pill input with Search icon)
-- `DietaryFilterChips` — All / Vegan / Vegetarian / Gluten-free / Halal / Alcohol-free
-- `ItemCard` — card with 80×80 image placeholder, name, price (€), description, energy/spice/portion indicators, allergen bubbles, dietary tags, sold-out and "New" badge states
-- `IndicatorRow` — 🔥 energy (1–3, Light/Satisfying/Hearty), 🌶️ spice (0–3), dot + S/M/L portion
-- `ItemDetail` — vaul bottom drawer on mobile, centered modal on desktop, with copy-link + WhatsApp share
-- `AllergenLegend` — drawer with G/D/N/E/S/F/C/M allergen key
-- `GuestActionBar` — fixed bottom bar with Call / Directions / WhatsApp / Wi-Fi / Review
-- `Footer` — "Powered by Hap"
-- `CookieBanner` — Accept/Decline
-- `ClosedOverlay` — full-screen "we're closed" overlay (dismissible)
-- All state persisted to `localStorage` (dark mode, language, menu type, category, large text, cookies)
+## Route overview
 
-Mock data (16 items): Albanian restaurant dishes — Byrek, Flija, Petulla, Tave Kosi, Qofte (Chef's Pick / promoted), Baklava, Fergese, Suxhuk (sold out), Trilece, Stuffed Vine Leaves, Shopska Salad, Patate te Ferguara, Albanian Espresso, Raki, Ayran, Tirana Sour (New)
+| Route | Current behavior |
+| --- | --- |
+| `/` | React marketing page |
+| `/preview` | Redirects to the default restaurant's guest menu |
+| `/menu/:slug` | Guest-facing restaurant menu |
+| `/r/:slug/admin` | Restaurant Overview |
+| `/r/:slug/admin/menu` | Menu Items |
+| `/r/:slug/admin/menu/design` | Menu Design |
+| `/r/:slug/admin/menu/promotions` | Promotions |
+| `/r/:slug/admin/menu/qr` | Menu QR |
+| `/r/:slug/admin/insights` | Insights |
+| `/r/:slug/admin/settings/*` | Restaurant, Team, and Billing settings |
+| `/super/*` | Hap Control prototype |
+| `/admin/*` | Legacy URLs redirected to the default restaurant-scoped admin |
 
-### 3. `/admin` → `src/routes/admin.tsx`
-The **admin shell layout** only — no sub-page content yet. Contains:
-- Desktop sidebar (fixed left, 240px) with logo area ("S" avatar, "Sofra / Restaurant") and nav links
-- Nav items: Dashboard / Menu / Promotions / QR Codes / Analytics / Settings / Billing
-- Sticky top header with current page title + "View as guest" link → `/menu/sofra`
-- Mobile bottom tab bar (5 tabs: Dashboard / Menu / Promos / QR / More)
-- Active state styling using `border-brand` + `bg-brand-subtle`
-- Sub-routes (`/admin/menu`, `/admin/promotions`, `/admin/qr`, `/admin/analytics`, `/admin/settings`, `/admin/billing`) exist in the router tree but have **no page components yet** — they render an empty `<Outlet />`
+Canonical and legacy route mappings live in `src/lib/hap-routes.ts`.
 
-## Static prototype (`public/hap/`)
-A separate vanilla JS/CSS prototype at `public/hap/index.html` with real food images (webp assets: burrata-tomato, grilled-octopus, caesar-salad, margherita, tiramisu, house-salad, pistachio-cheesecake, sea-bass, tomato-soup, truffle-burger, penne-arrabbiata) and `sofra-logo.svg`. This is served as-is via the `/` route iframe. Do not modify these static files unless I explicitly ask.
+## Phase 1 boundaries
 
-## What to build next
-I am ready to start building out the admin sub-pages and connecting the menu data to a real backend. Please wait for my next instruction and do not make any changes on your own.
+Phase 1 is mobile-first at 320, 390, and 430px. At 700px and above, the existing framed presentation is checked only for regressions.
 
-This project was built with [Lovable](https://lovable.dev).
+Phase 1 does not introduce or redesign:
 
-**Live app**: https://hap-menu-magic.lovable.app
+- Authentication or authorization
+- Production data or database structure
+- Payments or self-serve billing
+- Roles and tenancy
+- A true desktop/tablet administration layout
+- A broad global CSS rewrite
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/cc3f1ab2-a3e0-490a-8b87-3ba677f75f08).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+See `.lovable/plan.md` for the numbered, independently reviewable tasks.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requirements: Node.js and npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+Available checks:
+
+```sh
+npm run build
+npm run lint
+```
+
+## Working safely
+
+1. Read `AGENTS.md` and the project documents before planning or editing.
+2. Check open pull requests to avoid duplicating another agent's work.
+3. Use one task, one branch, one writing agent, and one pull request.
+4. Record decisions, checks, reviews, and handoffs in the active pull request.
+5. Merge only after reviewing the complete diff.
+6. Verify the merged commit in Lovable.
+
+Connected Lovable project: [eeee](https://lovable.dev/projects/751f4043-869d-4288-a057-aaa66f0508a2).
