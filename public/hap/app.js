@@ -1304,12 +1304,12 @@ function prototypeBar(){
  const isLanding=state.mode==='landing';
  const showViewMenu=state.mode==='admin' && state.role!=='super';
  const contextLabel=state.role==='super'?'Hap Control':state.mode==='preview'?'Guest menu':'Hap';
- return \`<div class="prototype-bar">
-   \${showViewMenu?\`<button class="proto-view-menu" data-action="view-menu" data-tour="preview-toggle">\${icon('eye',16)}<span>View menu</span></button>\`:\`<div class="proto-brand">\${contextLabel}</div>\`}
-   \${isLanding?\`<button class="proto-tool" data-action="go-landing" aria-label="Landing">\${icon('home',18)}</button>\`:\`<button class="proto-tool" data-action="go-landing" aria-label="Back to landing">\${icon('home',18)}</button>\`}
+ return `<div class="prototype-bar">
+   ${showViewMenu?`<button class="proto-view-menu" data-action="view-menu" data-tour="preview-toggle">${icon('eye',16)}<span>View menu</span></button>`:`<div class="proto-brand">${contextLabel}</div>`}
+   ${isLanding?`<button class="proto-tool" data-action="go-landing" aria-label="Landing">${icon('home',18)}</button>`:`<button class="proto-tool" data-action="go-landing" aria-label="Back to landing">${icon('home',18)}</button>`}
    
-   <button class="proto-tool" data-action="theme-toggle" aria-label="Toggle theme">\${icon(state.theme==='dark'?'sun':'moon',18)}</button>
-  </div>\`;
+   <button class="proto-tool" data-action="theme-toggle" aria-label="Toggle theme">${icon(state.theme==='dark'?'sun':'moon',18)}</button>
+  </div>`;
 }
 
 /* ---------------- Landing ----------------
