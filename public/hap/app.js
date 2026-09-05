@@ -1645,17 +1645,12 @@ function adminMenuItems(){
  const counts={all:items.length,soldout:items.filter(i=>i.status==='soldout').length,hidden:items.filter(i=>i.status==='hidden').length,promoted:items.filter(i=>isPromoLive(i.promotion)).length};
  const cats=state.categories.map(c=>({...c,items:c.items.filter(i=>(!q||(i.name+' '+itemIngredients(i)).toLowerCase().includes(q))&&(filter==='all'||(filter==='soldout'&&i.status==='soldout')||(filter==='hidden'&&i.status==='hidden')||(filter==='promoted'&&isPromoLive(i.promotion))))})).filter(c=>!q&&filter==='all'?true:c.items.length);
  const grid=ui.itemsGrid==='grid';
- return `<div class="page-head"><div><div class="eyebrow">Manage</div><h1 class="page-title">Menu</h1><p class="page-subtitle">${state.categories.length} categories · ${counts.all} dishes${counts.soldout?` · ${counts.soldout} sold out`:''}</p></div><div class="head-actions"><button class="icon-btn" data-action="admin-subpage" data-page="qr" aria-label="Menu QR code">${icon('qr',19)}</button><button class="icon-btn" data-action="add-chooser" data-tour="category" aria-label="Add item or category">${icon('plus',20)}</button></div></div>
- <div class="command-row" role="group" aria-label="Quick actions">
-  <button class="command-btn" data-action="bulk-availability"><i>${icon('eyeOff',18)}</i><span>Sold out</span></button>
-  <button class="command-btn" data-action="bulk-price"><i>${icon('edit',18)}</i><span>Prices</span></button>
-  <button class="command-btn" data-action="promo-chooser"><i>${icon('spark',18)}</i><span>Promote</span></button>
-  <button class="command-btn" data-action="admin-subpage" data-page="qr"><i>${icon('qr',18)}</i><span>QR code</span></button>
- </div>
+ return `<div class="page-head"><div><div class="eyebrow">Manage</div><h1 class="page-title">Menu</h1><p class="page-subtitle">${state.categories.length} categories · ${counts.all} dishes${counts.soldout?` · ${counts.soldout} sold out`:''}</p></div><div class="head-actions"><button class="btn primary menu-add" data-action="add-chooser" data-tour="category">${icon('plus',16)} <span>Add</span></button></div></div>
  <label class="search-field" data-tour="menu-search">${icon('search',17)}<input id="admin-search" value="${escapeHtml(ui.adminSearch||'')}" placeholder="Search dishes"></label>
- <div class="items-toolbar">
+ <div class="items-toolbar" role="group" aria-label="Menu view and tools">
   <div class="filter-row">${[['all','All'],['soldout','Sold out'],['hidden','Hidden'],['promoted','Promoted']].map(([id,n])=>`<button class="filter-chip ${filter===id?'active':''}" data-action="menu-filter" data-filter="${id}" aria-pressed="${filter===id}">${n}${counts[id]?` <b>${counts[id]}</b>`:''}</button>`).join('')}</div>
   <button class="icon-btn density-btn" data-action="items-density" aria-pressed="${grid}" aria-label="${grid?'Switch to list view':'Switch to compact grid'}">${icon(grid?'menu':'grid',18)}</button>
+  <button class="btn menu-tools-btn" data-action="menu-tools">${icon('more',16)} <span>More</span></button>
  </div>
  <div class="cat-strip" role="group" aria-label="Jump to category">${state.categories.map(c=>`<button class="cat-chip ${ui.expandedCategory===c.id?'active':''}" data-action="jump-category" data-id="${c.id}" aria-pressed="${ui.expandedCategory===c.id}">${escapeHtml(c.name)} <b>${c.items.length}</b></button>`).join('')}</div>
  ${cats.map(c=>renderAdminCategory(c)).join('')||'<div class="card empty">Nothing matches that search.</div>'}`;
@@ -1663,11 +1658,9 @@ function adminMenuItems(){
 
 function renderAdminCategory(c){
  const open=ui.expandedCategory===c.id;
- const idx=state.categories.findIndex(x=>x.id===c.id);
- const first=idx<=0, last=idx===state.categories.length-1;
  const featured=isPromotedCategory(c);
  const grid=ui.itemsGrid==='grid';
- return `<div class="card category-admin" id="cat-${c.id}"><div class="category-head-row"><button class="category-head" data-action="toggle-category" data-id="${c.id}"><div class="category-copy"><strong>${escapeHtml(c.name)}${featured?`<span class="cat-badge">${escapeHtml(c.promotion.label||'Featured')}</span>`:''}</strong><span>${c.items.length} items</span></div><span class="mini-icon">${icon(open?'up':'down',15)}</span></button><div class="category-actions"><button class="mini-icon" data-action="promote-category" data-id="${c.id}" aria-label="Promote ${escapeHtml(c.name)}">${icon('spark',14)}</button><button class="mini-icon" data-action="move-category" data-id="${c.id}" data-dir="up" aria-label="Move ${escapeHtml(c.name)} up" ${first?'disabled':''}>${icon('up',14)}</button><button class="mini-icon" data-action="move-category" data-id="${c.id}" data-dir="down" aria-label="Move ${escapeHtml(c.name)} down" ${last?'disabled':''}>${icon('down',14)}</button><button class="mini-icon" data-action="rename-category" data-id="${c.id}" aria-label="Rename ${escapeHtml(c.name)}">${icon('edit',14)}</button><button class="mini-icon danger" data-action="delete-category" data-id="${c.id}" aria-label="Delete ${escapeHtml(c.name)}">${icon('trash',14)}</button></div></div>${open?`<div class="category-body ${grid?'is-grid':''}">${c.items.map(i=>renderAdminItem(i,c)).join('')}<button class="btn small soft add-to-cat" data-action="open-add-item" data-category="${c.id}">${icon('plus',13)} Add to ${escapeHtml(c.name)}</button></div>`:''}</div>`;
+ return `<div class="card category-admin" id="cat-${c.id}"><div class="category-head-row"><button class="category-head" data-action="toggle-category" data-id="${c.id}" aria-expanded="${open}"><div class="category-copy"><strong>${escapeHtml(c.name)}${featured?`<span class="cat-badge">${escapeHtml(c.promotion.label||'Featured')}</span>`:''}</strong><span>${c.items.length} items</span></div><span class="mini-icon">${icon(open?'up':'down',15)}</span></button><div class="category-actions"><button class="btn category-more" data-action="category-actions" data-id="${c.id}">${icon('more',15)} <span>More</span></button></div></div>${open?`<div class="category-body ${grid?'is-grid':''}">${c.items.map(i=>renderAdminItem(i,c)).join('')}<button class="btn small soft add-to-cat" data-action="open-add-item" data-category="${c.id}">${icon('plus',13)} Add to ${escapeHtml(c.name)}</button></div>`:''}</div>`;
 }
 
 /* One clean line at 365px: name · status · price, plus inline quick actions
@@ -2254,6 +2247,8 @@ function renderSheet(){
  if(ui.sheet==='addItem') return addItemSheet();
  if(ui.sheet==='addCategory') return addCategorySheet();
  if(ui.sheet==='addChooser') return addChooserSheet();
+ if(ui.sheet==='menuTools') return menuToolsSheet();
+ if(ui.sheet==='categoryActions') return categoryActionsSheet();
  if(ui.sheet==='renameCategory') return renameCategorySheet();
 
  if(ui.sheet==='auth') return authSheet();
@@ -2376,6 +2371,21 @@ function addItemSheet(){ if(!state.categories.length) return sheetShell('Add men
 function addCategorySheet(){ return sheetShell('Add category','Keep category names short and scannable.',`<form id="add-category-form" class="form-grid"><div class="field"><label>Category name</label><input name="name" required placeholder="e.g. Breakfast"></div><button class="btn primary full" type="button" data-action="save-add-category">Add category</button></form>`); }
 function addChooserSheet(){
  return sheetShell('Add to your menu','What would you like to add?',`<div class="choice-grid"><button class="choice" data-action="open-add-item"><strong>${icon('plus',15)} Add item</strong><span>A dish with photo, price, allergens</span></button><button class="choice" data-action="open-add-category"><strong>${icon('menu',15)} Add category</strong><span>A new section, like Breakfast</span></button></div>`);
+}
+function menuToolsSheet(){
+ const rows=[['availability','Availability','Mark items sold out',icon('eyeOff',17)],['prices','Update prices','Edit every item inline',icon('edit',17)],['promotions','Promotions','Manage featured items',icon('spark',17)],['qr','QR code','Download or share your menu QR',icon('qr',17)]];
+ return sheetShell('Menu tools','Less frequent actions for the whole menu.',`<div class="settings-list">${rows.map(([id,title,sub,ic])=>`<button class="card settings-row" data-action="menu-tool" data-tool="${id}"><div class="settings-icon">${ic}</div><div class="settings-copy"><strong>${title}</strong><span>${sub}</span></div>${icon('chevron',15)}</button>`).join('')}</div>`);
+}
+function categoryActionsSheet(){
+ const c=state.categories.find(x=>x.id===ui.sheetData?.id); if(!c) return '';
+ const idx=state.categories.findIndex(x=>x.id===c.id);
+ return sheetShell(escapeHtml(c.name),`${c.items.length} items · Category actions`,`<div class="settings-list">
+  <button class="card settings-row" data-action="promote-category" data-id="${c.id}"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>Promote category</strong><span>Feature this section on the menu</span></div>${icon('chevron',15)}</button>
+  <button class="card settings-row" data-action="rename-category" data-id="${c.id}"><div class="settings-icon">${icon('edit',17)}</div><div class="settings-copy"><strong>Rename</strong></div>${icon('chevron',15)}</button>
+  <button class="card settings-row" data-action="move-category" data-id="${c.id}" data-dir="up" ${idx===0?'disabled':''}><div class="settings-icon">${icon('up',17)}</div><div class="settings-copy"><strong>Move up</strong></div></button>
+  <button class="card settings-row" data-action="move-category" data-id="${c.id}" data-dir="down" ${idx===state.categories.length-1?'disabled':''}><div class="settings-icon">${icon('down',17)}</div><div class="settings-copy"><strong>Move down</strong></div></button>
+  <button class="card settings-row" data-action="delete-category" data-id="${c.id}"><div class="settings-icon">${icon('trash',17)}</div><div class="settings-copy"><strong style="color:var(--danger)">Delete category</strong></div></button>
+ </div>`);
 }
 function renameCategorySheet(){
  const c=state.categories.find(x=>x.id===ui.sheetData?.id); if(!c) return '';
@@ -2694,6 +2704,16 @@ app.addEventListener('click',e=>{
  if(a==='open-add-item'){ if(!state.categories.length){ ui.sheet='addCategory'; ui.sheetData={}; toast('Add a category first'); render(); return; } ui.sheet='addItem'; ui.sheetData={category:btn.dataset.category||ui.expandedCategory||state.categories[0].id}; render(); return; }
  if(a==='open-add-category'){ ui.sheet='addCategory'; ui.sheetData={}; render(); return; }
  if(a==='add-chooser'){ ui.sheet='addChooser'; ui.sheetData={}; render(); return; }
+ if(a==='menu-tools'){ ui.sheet='menuTools'; ui.sheetData={}; render(); return; }
+ if(a==='menu-tool'){
+  const tool=btn.dataset.tool;
+  if(tool==='availability'){ ui.sheet='bulkAvailability'; ui.sheetData={temp:{}}; }
+  else if(tool==='prices'){ ui.sheet='bulkPrice'; ui.sheetData={}; }
+  else if(tool==='promotions'){ ui.sheet=null; ui.sheetData=null; setMenuTab('promotions'); save(); }
+  else if(tool==='qr'){ ui.sheet=null; ui.sheetData=null; state.adminTab='menu'; state.adminSubpage='qr'; save(); }
+  render(); return;
+ }
+ if(a==='category-actions'){ ui.sheet='categoryActions'; ui.sheetData={id:btn.dataset.id}; render(); return; }
  if(a==='rename-category'){ ui.sheet='renameCategory'; ui.sheetData={id:btn.dataset.id}; render(); return; }
  if(a==='save-rename-category'){ saveRenameCategoryForm(); return; }
  if(a==='move-category'){ moveCategory(btn.dataset.id,btn.dataset.dir); return; }

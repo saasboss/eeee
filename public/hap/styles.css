@@ -1005,3 +1005,14 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .checklist-body{gap:0;border-top:1px solid var(--line)}
 .check-row{min-height:48px;gap:8px;padding:8px 0}
 
+/* --- Phase 1 Task 11: Menu Items hierarchy and category grouping --- */
+.menu-add{align-self:flex-start;white-space:nowrap}
+.items-toolbar{margin-top:8px}
+.items-toolbar .filter-row{margin:0}
+.menu-tools-btn{flex:none;min-height:44px;padding:0 10px;white-space:nowrap}
+.category-head-row{min-height:64px;padding-right:8px}
+.category-head-row .category-head{min-height:64px;padding:12px 8px 12px 12px}
+.category-more{min-height:44px;padding:0 10px;gap:6px;white-space:nowrap}
+.category-actions{gap:0}
+.settings-row:disabled{opacity:.45;pointer-events:none}
+
