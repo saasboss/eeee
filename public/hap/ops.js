@@ -322,28 +322,35 @@ function staff(ctx){
 
 function adminSettings(ctx){
  const r=ctx.state.restaurant, o=ctx.state.ops;
+ if(!ctx.ui.settingsDraft){
+  ctx.ui.settingsDraft={
+   restaurant:{name:r.name,city:r.city,phone:r.phone,address:r.address,banner:r.banner,avatar:r.avatar},
+   hours:o.hours.map(([day,hours])=>[day,hours])
+  };
+ }
+ const draft=ctx.ui.settingsDraft, dr=draft.restaurant;
  return `${backHead(ctx,'Restaurant settings','Profile and service')}
  <section class="section"><div class="section-row"><div class="section-title">Profile</div></div>
  <div class="card form-card">
-  <div class="field"><label for="set-name">Restaurant name</label><input id="set-name" data-setting="name" value="${ctx.escapeHtml(r.name)}"></div>
-  <div class="field"><label for="set-city">City</label><input id="set-city" data-setting="city" value="${ctx.escapeHtml(r.city)}"></div>
-  <div class="field"><label for="set-phone">Phone</label><input id="set-phone" data-setting="phone" value="${ctx.escapeHtml(r.phone)}"></div>
-  <div class="field"><label for="set-address">Address</label><input id="set-address" data-setting="address" value="${ctx.escapeHtml(r.address)}"></div>
+  <div class="field"><label for="set-name">Restaurant name</label><input id="set-name" data-setting="name" value="${ctx.escapeHtml(dr.name)}"></div>
+  <div class="field"><label for="set-city">City</label><input id="set-city" data-setting="city" value="${ctx.escapeHtml(dr.city)}"></div>
+  <div class="field"><label for="set-phone">Phone</label><input id="set-phone" data-setting="phone" value="${ctx.escapeHtml(dr.phone)}"></div>
+  <div class="field"><label for="set-address">Address</label><input id="set-address" data-setting="address" value="${ctx.escapeHtml(dr.address)}"></div>
  </div></section>
  <section class="section"><div class="section-row"><div><div class="section-title">Brand images</div><div class="page-subtitle">Shown at the top of your public menu.</div></div></div>
  <div class="card form-card">
-  <div class="brand-preview"><div class="brand-preview-banner">${r.banner?`<img src="${ctx.escapeHtml(r.banner)}" alt="">`:`<span>${ctx.icon('image',18)} No banner</span>`}</div><div class="brand-preview-avatar">${r.avatar?`<img src="${ctx.escapeHtml(r.avatar)}" alt="">`:ctx.icon('image',16)}</div></div>
-  <div class="field"><label for="set-banner">Banner image</label><select id="set-banner" data-setting="banner"><option value="/hap/assets/banner.jpg" ${r.banner==='/hap/assets/banner.jpg'?'selected':''}>Seaside terrace</option><option value="/hap/assets/grilled-octopus.webp" ${r.banner==='/hap/assets/grilled-octopus.webp'?'selected':''}>Signature dish</option><option value="/hap/assets/margherita.webp" ${r.banner==='/hap/assets/margherita.webp'?'selected':''}>Pizza oven</option><option value="" ${!r.banner?'selected':''}>No banner (placeholder)</option></select></div>
-  <div class="field"><label for="set-avatar">Profile image</label><select id="set-avatar" data-setting="avatar"><option value="/hap/assets/sofra-logo.svg" ${r.avatar==='/hap/assets/sofra-logo.svg'?'selected':''}>Restaurant logo</option><option value="/hap/assets/truffle-burger.webp" ${r.avatar==='/hap/assets/truffle-burger.webp'?'selected':''}>Dish close-up</option><option value="" ${!r.avatar?'selected':''}>No image (placeholder)</option></select></div>
+  <div class="brand-preview"><div class="brand-preview-banner">${dr.banner?`<img src="${ctx.escapeHtml(dr.banner)}" alt="">`:`<span>${ctx.icon('image',18)} No banner</span>`}</div><div class="brand-preview-avatar">${dr.avatar?`<img src="${ctx.escapeHtml(dr.avatar)}" alt="">`:ctx.icon('image',16)}</div></div>
+  <div class="field"><label for="set-banner">Banner image</label><select id="set-banner" data-setting="banner"><option value="/hap/assets/banner.jpg" ${dr.banner==='/hap/assets/banner.jpg'?'selected':''}>Seaside terrace</option><option value="/hap/assets/grilled-octopus.webp" ${dr.banner==='/hap/assets/grilled-octopus.webp'?'selected':''}>Signature dish</option><option value="/hap/assets/margherita.webp" ${dr.banner==='/hap/assets/margherita.webp'?'selected':''}>Pizza oven</option><option value="" ${!dr.banner?'selected':''}>No banner (placeholder)</option></select></div>
+  <div class="field"><label for="set-avatar">Profile image</label><select id="set-avatar" data-setting="avatar"><option value="/hap/assets/sofra-logo.svg" ${dr.avatar==='/hap/assets/sofra-logo.svg'?'selected':''}>Restaurant logo</option><option value="/hap/assets/truffle-burger.webp" ${dr.avatar==='/hap/assets/truffle-burger.webp'?'selected':''}>Dish close-up</option><option value="" ${!dr.avatar?'selected':''}>No image (placeholder)</option></select></div>
  </div></section>
   ${ctx.currencyCard()}
  <section class="section"><div class="section-row"><div class="section-title">Opening hours</div></div>
-  <div class="card list-card">${o.hours.map(([d,h],i)=>`<div class="system-row"><strong>${d}</strong><input class="inline-input" data-hours="${i}" value="${ctx.escapeHtml(h)}" aria-label="${d} hours"></div>`).join('')}</div>
+  <div class="card list-card">${draft.hours.map(([d,h],i)=>`<div class="system-row"><strong>${d}</strong><input class="inline-input" data-hours="${i}" value="${ctx.escapeHtml(h)}" aria-label="${d} hours"></div>`).join('')}</div>
  </section>
  <section class="section"><div class="section-row"><div class="section-title">Notifications</div></div><div class="settings-list">
   ${[['dailySummary','Daily summary','Sales recap at closing'],['lowStock','Sold-out reminders','Nudge to restock dishes']].map(([k,t,s])=>`<div class="card settings-row"><div class="settings-copy"><strong>${t}</strong><span>${s}</span></div><button class="switch ${o.notifications[k]?'on':''}" role="switch" aria-checked="${!!o.notifications[k]}" aria-label="${t}" data-action="toggle-notification" data-key="${k}"><i></i></button></div>`).join('')}
  </div></section>
- <button class="btn primary full" data-action="save-restaurant-settings">Save changes</button>`;
+ <button class="btn primary full" data-action="save-restaurant-settings" ${ctx.ui.settingsDirty?'':'disabled'}>Save changes</button>`;
 }
 
 /* ---------------- sheets ---------------- */
@@ -500,8 +507,12 @@ function actions(a,btn,ctx){
   }
   case 'toggle-notification': ctx.state.ops.notifications[d.key]=!ctx.state.ops.notifications[d.key]; return done('Notifications updated');
   case 'save-restaurant-settings': {
-   document.querySelectorAll('[data-setting]').forEach(el=>{ ctx.state.restaurant[el.dataset.setting]=el.value; });
-   document.querySelectorAll('[data-hours]').forEach(el=>{ ctx.state.ops.hours[Number(el.dataset.hours)][1]=el.value; });
+   const draft=ctx.ui.settingsDraft;
+   if(!ctx.ui.settingsDirty||!draft) return true;
+   Object.assign(ctx.state.restaurant,draft.restaurant);
+   ctx.state.ops.hours=draft.hours.map(([day,hours])=>[day,hours]);
+   ctx.ui.settingsDirty=false;
+   ctx.ui.settingsDraft=null;
    return done('Settings saved');
   }
   case 'ops-add-category': ctx.ui.sheet='opsCategory'; ctx.ui.sheetData={rid:d.rid}; return done();
