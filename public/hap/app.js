@@ -2186,10 +2186,11 @@ function renderPublicCategory(c,ci){
  const promo=isPromotedCategory(c)?c.promotion:null;
 	return `<section class="menu-category ${promo?`is-featured tint-${promo.tint||'brand'}`:''}" id="cat-${c.id}" data-category="${c.id}">${categoryHead(tCategory(c),itemCountLabel(visible.length),promo?(promo.label||'Featured tonight'):'')}<div class="product-list">${visible.map((i,ii)=>renderPublicItem(i,c,ci*4+ii)).join('')}</div></section>`;
 }
-/* One header shape everywhere: kicker pill, title, count — stacked and centred
-   inside a block of fixed rhythm, so no rule ever meets a card border. */
+/* One header shape everywhere: kicker pill centred above, title on the left,
+   item count on the right — inside a block of fixed rhythm, so no rule ever
+   meets a card border. */
 function categoryHead(title,count,kicker){
-	return `<div class="menu-category-head"><div class="category-head-inner">${kicker?`<span class="category-kicker">${escapeHtml(kicker)}</span>`:''}<h2>${escapeHtml(title)}</h2><span class="category-count">${escapeHtml(count)}</span></div></div>`;
+	return `<div class="menu-category-head"><div class="category-head-inner">${kicker?`<span class="category-kicker">${escapeHtml(kicker)}</span>`:''}<div class="category-head-row"><h2>${escapeHtml(title)}</h2><span class="category-count">${escapeHtml(count)}</span></div></div></div>`;
 }
 /* One line, never wrapping, never stealing space from the price. The readable
    allergen wording stays; anything that does not fit is reachable through the
