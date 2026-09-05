@@ -110,7 +110,7 @@ svg{display:block}
 /* --- 1 · Aria (modern): centred, airy cards --- */
 /* Aria is the shipped default: warm-neutral surfaces, one restrained serif +
    sans pair, and cards that read well with or without dish photography. */
-.template-modern .menu-category-head{text-align:center;align-items:center;gap:4px}
+.template-modern .category-head-inner{gap:4px}
 .template-modern .menu-category-head h2{font-family:var(--font-serif);font-size:20px;letter-spacing:-.01em}
 .template-modern .menu-category-head .kicker,.template-modern .category-kicker{color:var(--menu-accent);letter-spacing:.14em;text-transform:uppercase}
 .template-modern .product-list{gap:10px}
@@ -122,7 +122,7 @@ svg{display:block}
 .template-modern .product-price{font-size:15.5px;font-family:var(--font-serif);color:var(--menu-brand)}
 .template-modern .category-chip.active{background:var(--menu-brand);border-color:var(--menu-brand)}
 /* --- 2 · Gazette (editorial): magazine column with a rule per dish --- */
-.template-editorial .menu-category-head{text-align:center;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--menu-line)}
+.template-editorial .menu-category-head{padding-bottom:10px;border-bottom:1px solid var(--menu-line)}
 .template-editorial .menu-category-head h2{font-family:var(--font-serif);font-size:26px;font-style:italic;letter-spacing:0}
 .template-editorial .product-list{gap:0}
 .template-editorial .menu-product{grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto auto;border:0;border-bottom:1px solid color-mix(in srgb,var(--menu-line) 80%,transparent);border-radius:0;background:transparent;padding:16px 0;align-items:start}
@@ -132,7 +132,7 @@ svg{display:block}
 .template-editorial .product-price{grid-column:2;grid-row:2;justify-self:end;align-self:end;margin-top:6px;font-family:var(--font-serif)}
 /* --- 3 · Noir: dark room, gold, centred plates --- */
 .template-noir .public-header{text-align:center}
-.template-noir .menu-category-head{text-align:center;align-items:center}
+.template-noir .menu-category-head h2{margin-right:auto}
 .template-noir .menu-category-head h2{font-family:var(--font-serif);text-transform:uppercase;font-size:16px;letter-spacing:.24em}
 .template-noir .menu-product{background:transparent;border:0;border-bottom:1px solid var(--menu-line);border-radius:0;padding:15px 0;grid-template-columns:66px minmax(0,1fr) auto}
 .template-noir .product-img{width:66px;height:66px;border-radius:50%;filter:grayscale(.2) contrast(1.06)}
@@ -143,7 +143,7 @@ svg{display:block}
 /* --- 4 · Bodega (street): ink outlines, hard shadow, sticker labels --- */
 .template-street .public-header{border-bottom:3px solid var(--menu-text);text-align:center}
 .template-street .restaurant-copy h1{font-weight:950;text-transform:uppercase;letter-spacing:-.04em}
-.template-street .menu-category-head{text-align:center;align-items:center}
+.template-street .category-head-row{align-items:center}
 .template-street .menu-category-head h2{display:inline-block;font-family:var(--font-sans);font-weight:950;text-transform:uppercase;letter-spacing:-.03em;background:var(--menu-text);color:var(--menu-bg);padding:3px 12px;border-radius:6px;transform:rotate(-1.2deg)}
 .template-street .menu-product{border:2px solid var(--menu-text);border-radius:12px;box-shadow:4px 4px 0 var(--menu-text)}
 .template-street .product-img{border-radius:7px;border:1.5px solid var(--menu-text)}
@@ -152,7 +152,7 @@ svg{display:block}
 .template-street .category-chip{border:2px solid var(--menu-text);border-radius:8px;font-weight:900;text-transform:uppercase;font-size:10px}
 .template-street .category-chip.active{background:var(--menu-text);color:var(--menu-bg);box-shadow:2px 2px 0 color-mix(in srgb,var(--menu-brand) 70%,transparent)}
 /* --- 5 · Kiosk (grid): two-column photo tiles --- */
-.template-grid .menu-category-head{text-align:center;align-items:center}
+
 .template-grid .product-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .template-grid .menu-product{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 8px 11px;border-radius:18px;gap:8px}
 .template-grid .product-img{width:100%;height:104px;border-radius:13px}
