@@ -902,8 +902,11 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 /* ===== Menu polish: header rhythm, featured panel, offer strip, Kiosk pager ===== */
 
 /* 1 · Category headers share one vertical rhythm across every template. */
-.menu-category-head{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;gap:5px;min-height:66px;padding:0 0 10px;margin:0 0 14px;width:100%}
-.category-head-inner{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;min-width:0}
+.menu-category-head{display:flex;align-items:flex-end;min-height:66px;padding:0 0 10px;margin:0 0 14px;width:100%}
+.category-head-inner{display:flex;flex-direction:column;gap:5px;width:100%;min-width:0}
+.category-head-inner .category-kicker{align-self:center}
+.category-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%}
+.category-head-row .category-count{flex:none;white-space:nowrap}
 .menu-category-head h2{margin:0}
 .menu-category-head .category-count{font-size:10px;color:var(--menu-muted)}
 .template-editorial .menu-category-head{padding-bottom:10px;border-bottom:1px solid var(--menu-line);margin-bottom:12px}
