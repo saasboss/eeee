@@ -2733,7 +2733,15 @@ app.addEventListener('click',e=>{
  }
  const btn=e.target.closest('[data-action]'); if(!btn) return; const a=btn.dataset.action;
  if(settingsActionLeaves(a,btn)){
-  if(ui.settingsDirty){ confirmRestaurantSettingsLeave(()=>btn.click()); return; }
+  if(ui.settingsDirty){
+   const tab=btn.dataset.tab||'', page=btn.dataset.page||'';
+   confirmRestaurantSettingsLeave(()=>{
+    render();
+    const target=[...app.querySelectorAll(`[data-action="${a}"]`)].find(node=>(node.dataset.tab||'')===tab&&(node.dataset.page||'')===page);
+    if(target) target.click();
+   });
+   return;
+  }
   clearRestaurantSettingsDraft();
  }
  const opensOverlay = ['open-auth','language-sheet','info-sheet','open-add-item','open-add-category','add-chooser','rename-category','edit-item','promote-item','restaurant-detail','open-sheet'].includes(a);
