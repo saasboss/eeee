@@ -2007,15 +2007,17 @@ function analyticsPage(){
  const ranges=`<div class="range-chips" role="group" aria-label="Date range">${INSIGHT_RANGES.map(([id,label])=>`<button class="filter-chip ${range===id?'active':''}" data-action="insights-range" data-range="${id}" aria-pressed="${range===id}">${label}</button>`).join('')}</div>`;
  const tab=insightsTab();
  const tabbar=`<div class="segment-control insights-tabbar" role="tablist" aria-label="Insight sections">${INSIGHT_TABS.map(([id,label])=>`<button id="insights-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="insights-panel" data-action="insights-tab" data-tab="${id}">${label}</button>`).join('')}</div>`;
+ const controls=`<div class="insights-controls">${tabbar}${ranges}</div>`;
  if(res.status==='denied') return `${head}${noPermissionPage('menu')}`;
  if(res.status!=='ok'||!events.length){
-  return `${head}${ranges}
-   <div class="card empty" style="padding:28px 16px;text-align:center"><strong>No guest activity in this period</strong><p style="color:var(--muted);margin:8px 0 16px">Insights only count real guests opening <code>/menu/${escapeHtml(menuSlug())}</code>. Your own previews are never recorded.</p><button class="btn primary" data-action="seed-analytics">Seed demo data</button></div>`;
+  return `<div class="insights-page">${head}${controls}
+   <div id="insights-panel" role="tabpanel" aria-labelledby="insights-tab-${tab}"><div class="insights-empty"><div class="empty-orb">${icon('chart',20)}</div><strong>No guest activity in this period</strong><p>Insights count only real guests opening <code>/menu/${escapeHtml(menuSlug())}</code>. Owner previews are excluded.</p><button class="btn soft" data-action="seed-analytics">Load demo-only data</button></div></div>
+  </div>`;
  }
  const bars = rows => rows.length
   ? rows.map(([label,count,pct])=>`<div class="bar-row"><div class="bar-label"><span>${escapeHtml(label)}</span><span>${fmtCount(count)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div></div>`).join('')
   : `<div class="empty-inline">Nothing recorded yet.</div>`;
- const traffic = `<div class="stat-grid">
+ const traffic = `<div class="stat-grid insights-metrics">
   <div class="card stat"><span>Menu opens</span><strong>${fmtCount(s.opens||0)}</strong><em class="stat-delta">${scans} QR · ${links} link</em></div>
   <div class="card stat"><span>Dish views</span><strong>${fmtCount(s.itemViews||0)}</strong><em class="stat-delta">${topItems.length} dishes seen</em></div>
   <div class="card stat"><span>Searches</span><strong>${fmtCount(s.searches||0)}</strong><em class="stat-delta">${(s.topSearches||[]).length} distinct terms</em></div>
@@ -2026,9 +2028,10 @@ function analyticsPage(){
  <section class="section"><div class="section-title" style="margin-bottom:10px">Top search terms</div><div class="card bar-list">${bars((s.topSearches||[]).map(([q,n],i,arr)=>[q,n,Math.round(n/arr[0][1]*100)]))}</div></section>`;
  const guests = `<section class="section"><div class="section-title" style="margin-bottom:10px">Guest languages</div><div class="card bar-list">${bars(langRows.map(([n,c,pct])=>[n,c,pct]))}</div></section>
  <section class="section"><div class="section-title" style="margin-bottom:10px">Filters used</div><div class="card bar-list">${bars([...(s.dietFilters||[]).map(([d,n])=>[dietLabel(d),n,100]),...(s.allergenFilters||[]).map(([c,n])=>[allergenFull(c),n,100])].map((r,_,arr)=>{const max=Math.max(...arr.map(x=>x[1]));return [r[0],r[1],Math.round(r[1]/max*100)];}))}</div></section>`;
- return `${head}${tabbar}${ranges}
- <div id="insights-panel" role="tabpanel" aria-labelledby="insights-tab-${tab}">${tab==='dishes'?dishes:tab==='guests'?guests:traffic}</div>
- <p class="fx-note">Counts come only from guest sessions on your public menu. Owner previews are excluded.</p>`;
+ return `<div class="insights-page">${head}${controls}
+  <div id="insights-panel" role="tabpanel" aria-labelledby="insights-tab-${tab}">${tab==='dishes'?dishes:tab==='guests'?guests:traffic}</div>
+  <p class="fx-note">Counts come only from guest sessions on your public menu. Owner previews are excluded.</p>
+ </div>`;
 }
 
 /* ---------------- Menu currency settings (lives inside Settings) ---------------- */
