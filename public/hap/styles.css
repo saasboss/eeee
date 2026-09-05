@@ -1007,6 +1007,19 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .range-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;margin-bottom:12px;padding-bottom:2px}
 .range-chips::-webkit-scrollbar{display:none}
 .range-chips .filter-chip{min-height:44px}
+.insights-page{display:grid;gap:12px;min-width:0}
+.insights-page .page-head{margin-bottom:0}
+.insights-controls{display:grid;gap:8px;padding-bottom:4px;border-bottom:1px solid var(--line);min-width:0}
+.insights-controls .insights-tabbar,.insights-controls .range-chips{margin-bottom:0}
+.insights-controls .range-chips{padding-bottom:0}
+.insights-metrics{align-items:stretch}
+.insights-metrics .stat{min-width:0;box-shadow:none}
+.insights-empty{padding:20px 12px 8px;text-align:center;display:grid;justify-items:center;gap:6px}
+.insights-empty .empty-orb{margin-bottom:2px}
+.insights-empty strong{font-size:14px}
+.insights-empty p{max-width:36ch;margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.45}
+.insights-empty code{font-size:11px}
+
 .command-btn:focus-visible,.density-btn:focus-visible,.cat-chip:focus-visible,.quick-pill:focus-visible,.quick-price:focus-visible,.quick-price input:focus-visible,.range-chips .filter-chip:focus-visible,.filter-chip:focus-visible,.mini-icon:focus-visible,.icon-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){
  .command-row,.cat-strip,.range-chips,.filter-row{scroll-behavior:auto;scroll-snap-type:none}
