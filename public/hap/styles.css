@@ -132,7 +132,7 @@ svg{display:block}
 .template-editorial .product-price{grid-column:2;grid-row:2;justify-self:end;align-self:end;margin-top:6px;font-family:var(--font-serif)}
 /* --- 3 · Noir: dark room, gold, centred plates --- */
 .template-noir .public-header{text-align:center}
-.template-noir .menu-category-head h2{margin-right:auto}
+.template-noir .category-head-inner{gap:6px}
 .template-noir .menu-category-head h2{font-family:var(--font-serif);text-transform:uppercase;font-size:16px;letter-spacing:.24em}
 .template-noir .menu-product{background:transparent;border:0;border-bottom:1px solid var(--menu-line);border-radius:0;padding:15px 0;grid-template-columns:66px minmax(0,1fr) auto}
 .template-noir .product-img{width:66px;height:66px;border-radius:50%;filter:grayscale(.2) contrast(1.06)}
