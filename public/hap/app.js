@@ -1721,7 +1721,7 @@ function adminPromote(){
   <div class="segment-control promotion-tabs" role="tablist" aria-label="Promotion status">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
   <div id="promotions-panel" role="tabpanel" aria-labelledby="promotions-tab-${segment}" class="promo-panel-stack">${volumeWarning}${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
   <section class="promo-help">
-   <button class="promo-help-toggle" data-action="promo-help" aria-expanded="${Boolean(ui.promoHelp)}" aria-controls="promotions-help"><span><strong>How promotions read</strong><small>Five styles that keep the price clear.</small></span>${icon(ui.promoHelp?'chevron-up':'chevron',18)}</button>
+   <button class="promo-help-toggle" data-action="promo-help" aria-expanded="${Boolean(ui.promoHelp)}" aria-controls="promotions-help"><span><strong>How promotions read</strong><small>Five styles that keep the price clear.</small></span>${icon('chevron',18)}</button>
    <div id="promotions-help" class="promo-help-list" ${ui.promoHelp?'':'hidden'}>${PROMO_STYLES.map(([id,n,desc])=>`<div class="card promo-help-row"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(desc)}</span></div></div>`).join('')}</div>
   </section>
  </div>`;
