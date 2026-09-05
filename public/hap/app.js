@@ -760,20 +760,19 @@ toastLayer.addEventListener('click',e=>{
 
 
 const TOUR_STEPS = [
- {target:null,title:'Welcome to Hap',body:'Your digital menu is already live. Let’s walk through the five things that matter — it takes about a minute.',cta:'Start tour',nav:{mode:'admin',role:'restaurant',tab:'home'}},
- {target:'status',title:'This is your live status',body:'One glance tells you the menu is published, how many categories are out there and what needs attention tonight.',cta:'Got it',nav:{mode:'admin',tab:'home'}},
- {target:'checklist',title:'Your setup checklist',body:'Anything unfinished lives here. Tick it off and the card disappears — no settings maze.',cta:'Next',nav:{mode:'admin',tab:'home'}},
- {target:'item',title:'Add your first dish',body:'Tap “Add item” to open the one-screen form.',tap:true,nav:{mode:'admin',tab:'home'}},
- {target:'sheet-primary',title:'Save it',body:'Name, price and a photo preset are enough. Tap “Add item” to save.',tap:true},
- {target:'nav-menu',title:'Your whole menu lives here',body:'Tap “Menu” to manage categories, photos and availability.',tap:true},
- {target:'menu-search',title:'Find anything fast',body:'Big menus stay usable: search, filter by sold out, and reorder in place.',cta:'Next'},
- {target:'promote',title:'Promote one dish',body:'Tap “Promote” on any item to make it noticeable on the public menu.',tap:true,nav:{mode:'admin',tab:'menu',expand:'popular'}},
- {target:'sheet-primary',title:'Choose how loud it is',body:'Pick a style and intensity, then save. Only one hero promotion runs at a time so the menu never feels spammy.',tap:true},
-  {target:'nav-settings',title:'Style the public menu',body:'Tap “Settings” — Appearance, team and billing all live there.',tap:true},
-  {target:'template',title:'Templates apply instantly',body:'Tap Classy, Noir, Market… the public menu restyles the moment you choose.',cta:'Next',nav:{mode:'admin',menuTab:'design'}},
-  {target:'nav-menu',title:'Share your QR code',body:'Your menu QR lives under Menu — download or share the code guests scan.',tap:true},
-
- {target:'preview-toggle',title:'See what guests see',body:'Tap View menu any time to open the real guest menu. That’s the tour — everything else is discoverable.',tap:true}
+ {target:null,title:'Welcome to Hap',body:'Here are 13 short pointers to the main workflow. You can skip at any time and keep working.',cta:'Start tour',nav:{mode:'admin',role:'restaurant',tab:'home'}},
+ {target:'status',title:'This is your live status',body:'One glance tells you whether the menu is published and how much is visible.',cta:'Next',nav:{mode:'admin',tab:'home'}},
+ {target:'checklist',title:'Your setup checklist',body:'Anything unfinished lives here. Completed setup rows disappear from your way.',cta:'Next',nav:{mode:'admin',tab:'home'}},
+ {target:'item',title:'Add a dish',body:'Add item opens the focused creation form.',tap:true,nav:{mode:'admin',tab:'home'}},
+ {target:'sheet-primary',title:'A small form is enough',body:'Name, price and a photo preset cover the useful first version. You do not need to save during this guide.',cta:'Next'},
+ {target:'nav-menu',title:'Your whole menu lives here',body:'Menu owns items, design and promotions.',cta:'Next',nav:{mode:'admin',tab:'menu'}},
+ {target:'menu-search',title:'Find anything fast',body:'Search stays prominent while filters and less-common tools remain close by.',cta:'Next'},
+ {target:'promote',title:'Open item actions',body:'Use the labelled item action to edit, change availability or promote a dish.',tap:true,nav:{mode:'admin',tab:'menu',expand:'popular'}},
+ {target:'promo-action',title:'Promote this dish',body:'Promote opens the focused promotion editor.',tap:true},
+ {target:'sheet-primary',title:'Control the emphasis',body:'Choose a style and schedule here. You do not need to save during this guide.',cta:'Next'},
+ {target:'template',title:'Design is part of Menu',body:'Menu › Design is the canonical home for templates, palette and background.',cta:'Next',nav:{mode:'admin',menuTab:'design'}},
+ {target:'qr-page',title:'Share your QR code',body:'Menu QR keeps Download primary and Share secondary.',cta:'Next',nav:{mode:'admin',subpage:'qr'}},
+ {target:'preview-toggle',title:'See what guests see',body:'View menu opens the real guest menu whenever you want. Everything else stays discoverable without blocking your work.',cta:'Finish'}
 ];
 
 function opsCtx(){
@@ -1770,7 +1769,7 @@ function tplMini(id){
  `</div>`;
 }
 function adminQr(){
- return `<div class="qr-page">
+ return `<div class="qr-page" data-tour="qr-page">
   <div class="page-head"><div><div class="eyebrow">Scan to open</div><h1 class="page-title">Your menu QR</h1><p class="page-subtitle">Ready for windows, counters and print.</p></div></div>
   <div class="card qr-card qr-${state.qrStyle}"><div class="qr-wrap"><canvas id="live-qr" width="360" height="360" aria-label="QR code to your public menu"></canvas></div><div class="qr-title">${escapeHtml(state.restaurant.name)}</div><div class="qr-note">Opens your public menu at <code>/menu/${escapeHtml(menuSlug())}</code>.</div><div class="qr-actions"><button class="btn primary" data-action="download-qr">${icon('download',15)} Download</button><button class="btn" data-action="share-preview">${icon('share',15)} Share</button></div></div>
   <section class="section"><div class="section-row"><div class="section-title">Change design</div></div><div class="preset-scroll">${['simple','brand','counter','window','premium','social'].map(id=>`<button class="preset ${state.qrStyle===id?'selected':''}" data-action="qr-style" data-style="${id}"><div class="preset-preview"><div style="width:42px;height:42px;background:#fff;border:5px solid ${id==='brand'?'var(--brand)':'#ddd'};margin:auto"></div></div><strong>${id[0].toUpperCase()+id.slice(1)}</strong></button>`).join('')}</div></section>
@@ -1786,7 +1785,7 @@ function adminSettingsHub(){
  <div class="segment-control settings-tabbar" role="tablist" aria-label="Settings sections">${SETTINGS_TABS.map(([id,label])=>`<button id="settings-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="settings-panel" data-action="settings-tab" data-tab="${id}">${label}</button>`).join('')}</div>
  <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab-${tab}">${body}</div>
  <section class="section"><div class="section-row"><div class="section-title">Prototype tools</div></div><div class="settings-list">
-  <button class="card settings-row" data-action="replay-onboarding"><div class="settings-icon">${icon('spark',18)}</div><div class="settings-copy"><strong>Replay onboarding</strong><span>Run the focused 5-step guide</span></div>${icon('chevron',17)}</button>
+  <button class="card settings-row" data-action="replay-onboarding"><div class="settings-icon">${icon('spark',18)}</div><div class="settings-copy"><strong>Replay onboarding</strong><span>Run the optional 13-step guide</span></div>${icon('chevron',17)}</button>
   <button class="card settings-row" data-action="new-customer"><div class="settings-icon">${icon('eye',18)}</div><div class="settings-copy"><strong>Open as new customer</strong><span>Replay language + promotion flow</span></div>${icon('chevron',17)}</button>
   <button class="card settings-row" data-action="reset-demo"><div class="settings-icon">${icon('refresh',18)}</div><div class="settings-copy"><strong>Reset demo data</strong><span>Restore the original Sofra prototype</span></div>${icon('chevron',17)}</button>
  </div></section>`;
@@ -2556,7 +2555,7 @@ function itemActionsSheet(){
  const i=f.item;
  const rows=[['edit-item','Edit',icon('edit',17)],['cycle-status','Availability',icon('eyeOff',17)],['promote-item','Promote',icon('spark',17)],['move-item-up','Move up',icon('up',17)],['move-item-down','Move down',icon('down',17)]];
  return sheetShell(escapeHtml(i.name),`${escapeHtml(f.category.name)} · ${itemPriceLabel(i)}`,`
- <div class="settings-list">${rows.map(([a,n,ic])=>`<button class="card settings-row" data-action="${a}" data-id="${i.id}" data-dir="${a==='move-item-up'?'up':'down'}"><div class="settings-icon">${ic}</div><div class="settings-copy"><strong>${n}</strong></div>${icon('chevron',15)}</button>`).join('')}
+ <div class="settings-list">${rows.map(([a,n,ic])=>`<button class="card settings-row" data-action="${a}" data-id="${i.id}" data-dir="${a==='move-item-up'?'up':'down'}" ${a==='promote-item'?'data-tour="promo-action"':''}><div class="settings-icon">${ic}</div><div class="settings-copy"><strong>${n}</strong></div>${icon('chevron',15)}</button>`).join('')}
  <button class="card settings-row" data-action="delete-item" data-id="${i.id}"><div class="settings-icon">${icon('trash',17)}</div><div class="settings-copy"><strong style="color:var(--danger)">Delete</strong></div></button></div>`);
 }
 function restaurantDetailSheet(){
@@ -2661,7 +2660,7 @@ function applyTourNav(i){
  if(nav.tab){ state.adminTab=nav.tab; state.adminSubpage=null; }
  if(nav.subpage && ADMIN_SUBPAGES[nav.subpage]){ state.adminSubpage=nav.subpage; state.adminTab=ADMIN_SUBPAGES[nav.subpage].tab; }
  if(nav.menuTab) setMenuTab(nav.menuTab);
-
+ if(nav.tab||nav.subpage||nav.menuTab) ui.sheet=null;
  if(nav.expand) ui.expandedCategory=nav.expand;
 }
 function startTour(){ state.tour={active:true,step:0,done:false}; state.mode='admin'; state.role='restaurant'; state.adminTab='home'; state.adminSubpage=null; ui.sheet=null; ui.modal=null; applyTourNav(0); save(); render(); }
@@ -2782,7 +2781,7 @@ app.addEventListener('click',e=>{
  if(a==='open-auth'){ ui.sheet='auth'; ui.sheetData={mode:btn.dataset.mode||'signup'}; render(); return; }
  if(a==='auth-mode'){ ui.sheetData={mode:btn.dataset.mode}; render(); return; }
  if(a==='auth-submit'){ const f=document.getElementById('auth-form'); const email=f?String(new FormData(f).get('email')||'').trim():''; ui.sheet=null; ui.sheetData=null; state.mode='admin'; state.role='restaurant'; state.adminTab='home'; state.adminSubpage=null; save(); render(); toast(email?`Signed in as ${email}`:'Signed in to the demo workspace'); return; }
- if(a==='open-demo'){ state.mode='admin'; state.role='restaurant'; state.adminTab='home'; state.adminSubpage=null; ui.sheet=null; if(state.tour&&!state.tour.done) state.tour={active:true,step:0,done:false}; save(); render(); return; }
+ if(a==='open-demo'){ state.mode='admin'; state.role='restaurant'; state.adminTab='home'; state.adminSubpage=null; ui.sheet=null; save(); render(); return; }
  if(a==='open-guest-menu'){ openPublicMenu(); return; }
 
  if(a==='edit-item'){ ui.sheet='editItem'; ui.sheetData={id:btn.dataset.id}; render(); return; }
@@ -3288,10 +3287,10 @@ lastPath = (String(bootPath).split('?')[0].replace(/\/+$/,'') || '/');
 
 if(!state.tour) state.tour={active:false,step:0,done:false};
 // The tour belongs to the admin demo, never to the landing screen or the
-// public menu. It starts when someone actually opens the demo.
+// public menu. It starts only when someone explicitly chooses Replay onboarding.
 if(state.tour.active && state.mode!=='admin') state.tour={active:false,step:0,done:state.tour.done};
 if(PUBLIC_CTX && state.tour.active) state.tour={active:false,step:0,done:state.tour.done};
-else if(!PUBLIC_CTX && stripTenant(String(bootPath).split('?')[0].replace(/\/+$/,''))==='/admin' && !state.tour.done && !state.tour.active && state.mode==='admin'){ state.tour={active:true,step:0,done:false}; }
+
 
 
 /** Keeps Tab focus inside the topmost overlay (sheet, confirm or modal). */
