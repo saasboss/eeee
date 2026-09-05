@@ -765,7 +765,7 @@ const TOUR_STEPS = [
  {target:'checklist',title:'Your setup checklist',body:'Anything unfinished lives here. Completed setup rows disappear from your way.',cta:'Next',nav:{mode:'admin',tab:'home'}},
  {target:'item',title:'Add a dish',body:'Add item opens the focused creation form.',tap:true,nav:{mode:'admin',tab:'home'}},
  {target:'sheet-primary',title:'A small form is enough',body:'Name, price and a photo preset cover the useful first version. You do not need to save during this guide.',cta:'Next'},
- {target:'nav-menu',title:'Your whole menu lives here',body:'Menu owns items, design and promotions.',tap:true},
+ {target:'nav-menu',title:'Your whole menu lives here',body:'Menu owns items, design and promotions.',cta:'Next',nav:{mode:'admin',tab:'menu'}},
  {target:'menu-search',title:'Find anything fast',body:'Search stays prominent while filters and less-common tools remain close by.',cta:'Next'},
  {target:'promote',title:'Open item actions',body:'Use the labelled item action to edit, change availability or promote a dish.',tap:true,nav:{mode:'admin',tab:'menu',expand:'popular'}},
  {target:'promo-action',title:'Promote this dish',body:'Promote opens the focused promotion editor.',tap:true},
