@@ -184,9 +184,41 @@ function syncPath(){
 }
 /* A route change that happened outside the application (host links, back and
    forward) is applied here. */
+function onRestaurantSettings(){
+ return state.mode==='admin'&&state.role==='restaurant'&&state.adminTab==='settings'&&settingsTab()==='restaurant';
+}
+function clearRestaurantSettingsDraft(){
+ ui.settingsDirty=false;
+ ui.settingsDraft=null;
+}
+function confirmRestaurantSettingsLeave(run){
+ if(!ui.settingsDirty){ clearRestaurantSettingsDraft(); run(); return; }
+ showConfirm({
+  title:'Discard unsaved changes?',
+  body:'Your restaurant profile or opening-hours edits have not been saved.',
+  label:'Discard changes',
+  tone:'danger',
+  run(){ clearRestaurantSettingsDraft(); run(); }
+ });
+}
+function settingsActionLeaves(a,btn){
+ if(!onRestaurantSettings()) return false;
+ if(a==='settings-tab') return btn.dataset.tab!=='restaurant';
+ if(a==='admin-tab') return btn.dataset.tab!=='settings';
+ return ['view-menu','menu-tab','admin-subpage','subpage-back','go-landing','open-guest-menu'].includes(a);
+}
 function applyHostRoute(path){
  if(typeof path!=='string') return;
- if(path===currentPath()){ lastPath=path; return; }
+ const current=currentPath();
+ if(path===current){ lastPath=path; return; }
+ if(onRestaurantSettings()){
+  if(ui.settingsDirty){
+   emitNavigate(current);
+   confirmRestaurantSettingsLeave(()=>applyHostRoute(path));
+   return;
+  }
+  clearRestaurantSettingsDraft();
+ }
  applyPath(path); lastPath=path; save(); render();
 }
 window.addEventListener('message',e=>{
@@ -194,6 +226,11 @@ window.addEventListener('message',e=>{
  const d=e.data;
  if(!d || d.type!=='hap:route' || typeof d.path!=='string') return;
  applyHostRoute(d.path);
+});
+window.addEventListener('beforeunload',e=>{
+ if(!ui.settingsDirty) return;
+ e.preventDefault();
+ e.returnValue='';
 });
 
 const ICONS = {
@@ -1051,7 +1088,7 @@ function normalizeAppearance(a){
 
 let ui={sheet:null,sheetData:null,modal:null,expandedCategory:'popular',menuSearch:'',superSearch:'',languageSearch:'',editingItem:null,adminSearch:'',menuFilter:'all',superFilter:'all',userFilter:'all',subId:null,userSearch:'',confirm:null,skeleton:false,lastFocus:null,hoursOpen:false,dietFilter:'all',displayCurrency:null,transLang:null,
  /* Menu workspace */
- menuCategory:'all', menuSelect:null, menuReorder:false, menuPreview:false, menuError:false, menuLoading:false, menuDirty:false, menuMore:false, promoHelp:false, itemDraft:null};
+ menuCategory:'all', menuSelect:null, menuReorder:false, menuPreview:false, menuError:false, menuLoading:false, menuDirty:false, menuMore:false, promoHelp:false, settingsDirty:false, settingsDraft:null, itemDraft:null};
 
 
 
@@ -2695,6 +2732,10 @@ app.addEventListener('click',e=>{
   if(st&&st.tap&&st.target&&e.target.closest('[data-tour="'+st.target+'"]')) setTimeout(()=>{ if(state.tour.active) tourNext(); },0);
  }
  const btn=e.target.closest('[data-action]'); if(!btn) return; const a=btn.dataset.action;
+ if(settingsActionLeaves(a,btn)){
+  if(ui.settingsDirty){ confirmRestaurantSettingsLeave(()=>btn.click()); return; }
+  clearRestaurantSettingsDraft();
+ }
  const opensOverlay = ['open-auth','language-sheet','info-sheet','open-add-item','open-add-category','add-chooser','rename-category','edit-item','promote-item','restaurant-detail','open-sheet'].includes(a);
  if(opensOverlay) rememberFocus(btn);
  if(a==='view-menu'){ openPublicMenu(); return; }
@@ -2884,9 +2925,39 @@ app.addEventListener('change',e=>{
  if(el.matches('[data-action="brand-custom"]')){ state.appearance.brand=el.value; state.appearance.palette='custom'; save(); markPicker('.palette-scroll','custom','.palette-dots'); refreshBackgroundCards(); const note=document.querySelector('.custom-color-note'); if(note) note.textContent='Custom colour in use'; return; }
  if(el.matches('[data-action="set-primary-currency"]')){ setPrimaryCurrency(el.value); return; }
  if(el.matches('[data-action="pick-translation-language"]')){ ui.transLang=el.value; render(); return; }
- if(el.matches('[data-setting]')){ state.restaurant[el.dataset.setting]=el.value; save(); toast('Saved'); return; }
+ if(el.matches('[data-setting]')){
+  if(!ui.settingsDraft) return;
+  ui.settingsDraft.restaurant[el.dataset.setting]=el.value;
+  updateRestaurantSettingsDirty();
+  return;
+ }
 });
+function restaurantSettingsDraftIsDirty(){
+ const draft=ui.settingsDraft;
+ if(!draft) return false;
+ const fields=['name','city','phone','address','banner','avatar'];
+ if(fields.some(key=>String(draft.restaurant[key]??'')!==String(state.restaurant[key]??''))) return true;
+ return draft.hours.some(([day,hours],i)=>day!==state.ops.hours[i]?.[0]||String(hours)!==String(state.ops.hours[i]?.[1]??''));
+}
+function updateRestaurantSettingsDirty(){
+ ui.settingsDirty=restaurantSettingsDraftIsDirty();
+ const saveButton=document.querySelector('[data-action="save-restaurant-settings"]');
+ if(saveButton) saveButton.disabled=!ui.settingsDirty;
+}
 app.addEventListener('input',e=>{
+ if(e.target.matches('[data-setting]')){
+  if(!ui.settingsDraft) return;
+  ui.settingsDraft.restaurant[e.target.dataset.setting]=e.target.value;
+  updateRestaurantSettingsDirty();
+  return;
+ }
+ if(e.target.matches('[data-hours]')){
+  if(!ui.settingsDraft) return;
+  const index=Number(e.target.dataset.hours);
+  if(ui.settingsDraft.hours[index]) ui.settingsDraft.hours[index][1]=e.target.value;
+  updateRestaurantSettingsDirty();
+  return;
+ }
  if(e.target.matches('[data-rate]')){ handleRateInput(e.target); return; }
  if(e.target.matches('[data-tr-id]')){ handleTranslationInput(e.target); return; }
  if(e.target.id==='language-search'){ ui.languageSearch=e.target.value; const pos=e.target.selectionStart; render(); const n=document.getElementById('language-search'); if(n){n.focus();n.setSelectionRange(pos,pos);} }
