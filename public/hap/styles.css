@@ -1017,15 +1017,17 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .settings-row:disabled{opacity:.45;pointer-events:none}
 
 /* --- Phase 1 Task 13: Design grid and single-chrome QR --- */
-.design-page{display:grid;gap:16px}
+.design-page{display:grid;gap:16px;min-width:0}
 .design-page>.page-head,.design-page>.appearance-hero,.design-page>.appearance-group{margin:0}
 .design-page .appearance-group{display:grid;gap:8px}
 .design-page .appearance-group>label,.design-page .template-dots,.design-page .custom-color-row{margin:0}
-.qr-page{display:grid;gap:16px}
+.qr-page{display:grid;gap:16px;min-width:0}
 .qr-page>.page-head,.qr-page>.section{margin:0}
 .qr-page .section-row{margin-bottom:8px}
 .qr-card{padding:16px}
 .qr-wrap{width:192px;max-width:76%;margin:0 auto 12px;padding:12px}
 .qr-title{margin-top:0}
 .qr-actions{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:8px;margin-top:16px}
+.design-page>*,.qr-page>*{min-width:0}
+.design-page .preset-scroll,.qr-page .preset-scroll{width:100%;min-width:0}
 
