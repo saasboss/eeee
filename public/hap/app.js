@@ -1724,10 +1724,11 @@ function tplMini(id){
  `</div>`;
 }
 function adminQr(){
- return `${subHead('Menu QR','Menu')}
+ return `<div class="qr-page">
   <div class="page-head"><div><div class="eyebrow">Scan to open</div><h1 class="page-title">Your menu QR</h1><p class="page-subtitle">Ready for windows, counters and print.</p></div></div>
-  <div class="card qr-card qr-${state.qrStyle}"><div class="qr-wrap"><canvas id="live-qr" width="360" height="360" aria-label="QR code to this deployed Preview"></canvas></div><div class="qr-title">${escapeHtml(state.restaurant.name)}</div><div class="qr-note">This QR uses the current deployed URL · #preview</div><div class="qr-actions"><button class="btn primary" data-action="download-qr">${icon('download',15)} Download</button><button class="btn" data-action="share-preview">${icon('share',15)} Share</button></div></div>
- <section class="section"><div class="section-row"><div class="section-title">Change design</div></div><div class="preset-scroll">${['simple','brand','counter','window','premium','social'].map(id=>`<button class="preset ${state.qrStyle===id?'selected':''}" data-action="qr-style" data-style="${id}"><div class="preset-preview"><div style="width:42px;height:42px;background:#fff;border:5px solid ${id==='brand'?'var(--brand)':'#ddd'};margin:auto"></div></div><strong>${id[0].toUpperCase()+id.slice(1)}</strong></button>`).join('')}</div></section>`;
+  <div class="card qr-card qr-${state.qrStyle}"><div class="qr-wrap"><canvas id="live-qr" width="360" height="360" aria-label="QR code to your public menu"></canvas></div><div class="qr-title">${escapeHtml(state.restaurant.name)}</div><div class="qr-note">Opens your public menu at <code>/menu/${escapeHtml(menuSlug())}</code>.</div><div class="qr-actions"><button class="btn primary" data-action="download-qr">${icon('download',15)} Download</button><button class="btn" data-action="share-preview">${icon('share',15)} Share</button></div></div>
+  <section class="section"><div class="section-row"><div class="section-title">Change design</div></div><div class="preset-scroll">${['simple','brand','counter','window','premium','social'].map(id=>`<button class="preset ${state.qrStyle===id?'selected':''}" data-action="qr-style" data-style="${id}"><div class="preset-preview"><div style="width:42px;height:42px;background:#fff;border:5px solid ${id==='brand'?'var(--brand)':'#ddd'};margin:auto"></div></div><strong>${id[0].toUpperCase()+id.slice(1)}</strong></button>`).join('')}</div></section>
+ </div>`;
 }
 function adminSettingsHub(){
  const tab=settingsTab();
@@ -1738,9 +1739,6 @@ function adminSettingsHub(){
  return `<div class="page-head"><div><div class="eyebrow">Restaurant controls</div><h1 class="page-title">Settings</h1><p class="page-subtitle">Everything else, without turning into a settings maze.</p></div></div>
  <div class="segment-control settings-tabbar" role="tablist" aria-label="Settings sections">${SETTINGS_TABS.map(([id,label])=>`<button id="settings-tab-${id}" class="${tab===id?'active':''}" role="tab" aria-selected="${tab===id}" aria-controls="settings-panel" data-action="settings-tab" data-tab="${id}">${label}</button>`).join('')}</div>
  <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab-${tab}">${body}</div>
- <section class="section"><div class="section-row"><div class="section-title">Appearance</div></div><div class="settings-list">
-  <button class="card settings-row" data-action="menu-tab" data-tab="design"><div class="settings-icon">${icon('palette',18)}</div><div class="settings-copy"><strong>Menu design</strong><span>Template, palette and background</span></div>${icon('chevron',17)}</button>
- </div></section>
  <section class="section"><div class="section-row"><div class="section-title">Prototype tools</div></div><div class="settings-list">
   <button class="card settings-row" data-action="replay-onboarding"><div class="settings-icon">${icon('spark',18)}</div><div class="settings-copy"><strong>Replay onboarding</strong><span>Run the focused 5-step guide</span></div>${icon('chevron',17)}</button>
   <button class="card settings-row" data-action="new-customer"><div class="settings-icon">${icon('eye',18)}</div><div class="settings-copy"><strong>Open as new customer</strong><span>Replay language + promotion flow</span></div>${icon('chevron',17)}</button>
@@ -1876,7 +1874,7 @@ function paletteDots(){
 function appearancePage(){
  const a=state.appearance;
  const current=templateOf(a.template);
- return `<div class="page-head"><div><div class="eyebrow">Live editor</div><h1 class="page-title">Design</h1><p class="page-subtitle">Template, palette and background of your public menu.</p></div></div>
+ return `<div class="design-page"><div class="page-head"><div><div class="eyebrow">Live editor</div><h1 class="page-title">Design</h1><p class="page-subtitle">Template, palette and background of your public menu.</p></div></div>
  <div class="appearance-hero card">
   <div><div class="eyebrow">Current style</div><strong>${escapeHtml(current.name)}</strong><span>${escapeHtml(current.sub)}</span></div>
   <button class="btn small primary" data-action="open-guest-menu">${icon('eye',14)} Preview</button>
@@ -1885,7 +1883,7 @@ function appearancePage(){
  <div class="appearance-group"><label>Palette</label><div class="preset-scroll palette-scroll">${paletteCards()}</div><div class="template-dots palette-dots" aria-hidden="true">${paletteDots()}</div>
   <div class="color-row custom-color-row"><input class="color-input" type="color" value="${a.brand}" data-action="brand-custom" aria-label="Custom brand colour"><span class="custom-color-note">${a.palette==='custom'?'Custom colour in use':'Or pick your own colour'}</span></div></div>
  <div class="appearance-group"><label>Background</label><div class="preset-scroll background-scroll">${backgrounds.map(([id,name])=>`<button class="preset ${a.background===id?'selected':''}" data-action="background" data-value="${id}" aria-pressed="${a.background===id}">${backgroundPreview(id)}<strong>${escapeHtml(name)}</strong></button>`).join('')}</div></div>
- <div class="appearance-group"><label>Mode</label><div class="segment-control"><button class="${state.theme==='light'?'active':''}" data-action="set-theme" data-theme="light">Light</button><button class="${state.theme==='dark'?'active':''}" data-action="set-theme" data-theme="dark">Dark</button></div></div>`;
+ <div class="appearance-group"><label>Mode</label><div class="segment-control"><button class="${state.theme==='light'?'active':''}" data-action="set-theme" data-theme="light">Light</button><button class="${state.theme==='dark'?'active':''}" data-action="set-theme" data-theme="dark">Dark</button></div></div></div>`;
 
 }
 
