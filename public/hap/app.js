@@ -1051,7 +1051,7 @@ function normalizeAppearance(a){
 
 let ui={sheet:null,sheetData:null,modal:null,expandedCategory:'popular',menuSearch:'',superSearch:'',languageSearch:'',editingItem:null,adminSearch:'',menuFilter:'all',superFilter:'all',userFilter:'all',subId:null,userSearch:'',confirm:null,skeleton:false,lastFocus:null,hoursOpen:false,dietFilter:'all',displayCurrency:null,transLang:null,
  /* Menu workspace */
- menuCategory:'all', menuSelect:null, menuReorder:false, menuPreview:false, menuError:false, menuLoading:false, menuDirty:false, menuMore:false, itemDraft:null};
+ menuCategory:'all', menuSelect:null, menuReorder:false, menuPreview:false, menuError:false, menuLoading:false, menuDirty:false, menuMore:false, promoHelp:false, itemDraft:null};
 
 
 
@@ -1709,15 +1709,24 @@ function adminPromote(){
   scheduled:'Nothing is queued. Give a promotion a start time and it waits here until it opens.',
   past:'No promotion has finished yet. Ended and expired promotions are kept here.'
  };
- return `<div class="page-head"><div><div class="eyebrow">Attention without noise</div><h1 class="page-title">Promote</h1><p class="page-subtitle">${live.length?`${live.length} live`:'Nothing live right now'}</p></div></div>
- <button class="btn primary full" style="margin-bottom:12px" data-action="promo-chooser">${icon('plus',16)} New promotion</button>
- ${ui.promoError?`<div class="promo-warn">${escapeHtml(ui.promoError)}</div>`:''}
- ${itemCount>3?`<div class="promo-warn">${itemCount} promotions active — the menu stops feeling special.</div>`:''}
- <div class="segment-control" role="tablist" aria-label="Promotion status" style="margin-bottom:12px">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
- <div id="promotions-panel" role="tabpanel" aria-labelledby="promotions-tab-${segment}">${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
- <section class="section"><div class="section-row"><div><div class="section-title">How promotions read</div><div class="page-subtitle">Five compositions. Each one keeps the price protected.</div></div></div><div class="settings-list">${PROMO_STYLES.map(([id,n,desc])=>`<div class="card settings-row"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(desc)}</span></div></div>`).join('')}</div></section>`;
-
+ const volumeWarning=segment==='active'&&itemCount>3
+  ? `<div class="promo-warn promo-volume-warn">${itemCount} item promotions are active — keep the list selective so featured dishes still feel special.</div>`
+  : '';
+ return `<div class="promotions-page">
+  <div class="page-head"><div><div class="eyebrow">Attention without noise</div><h1 class="page-title">Promotions</h1><p class="page-subtitle">${live.length?`${live.length} live`:'Nothing live right now'}</p></div></div>
+  <div class="promotions-primary">
+   <button class="btn primary full" data-action="promo-chooser">${icon('plus',16)} New promotion</button>
+   ${ui.promoError?`<div class="promo-warn">${escapeHtml(ui.promoError)}</div>`:''}
+  </div>
+  <div class="segment-control promotion-tabs" role="tablist" aria-label="Promotion status">${PROMO_SEGMENTS.map(([id,label])=>`<button id="promotions-tab-${id}" class="${segment===id?'active':''}" role="tab" aria-selected="${segment===id}" aria-controls="promotions-panel" data-action="promo-segment" data-segment="${id}">${label}${counts[id]?` (${counts[id]})`:''}</button>`).join('')}</div>
+  <div id="promotions-panel" role="tabpanel" aria-labelledby="promotions-tab-${segment}" class="promo-panel-stack">${volumeWarning}${rows.length?`<div class="promo-manager">${rows.map(promoRowMarkup).join('')}</div>`:`<div class="card empty">${emptyCopy[segment]}</div>`}</div>
+  <section class="promo-help">
+   <button class="promo-help-toggle" data-action="promo-help" aria-expanded="${Boolean(ui.promoHelp)}" aria-controls="promotions-help"><span><strong>How promotions read</strong><small>Five styles that keep the price clear.</small></span>${icon(ui.promoHelp?'chevron-up':'chevron',18)}</button>
+   <div id="promotions-help" class="promo-help-list" ${ui.promoHelp?'':'hidden'}>${PROMO_STYLES.map(([id,n,desc])=>`<div class="card promo-help-row"><div class="settings-icon">${icon('spark',17)}</div><div class="settings-copy"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(desc)}</span></div></div>`).join('')}</div>
+  </section>
+ </div>`;
 }
+
 function tplMini(id){
  return `<div class="tpl-mini template-${id}"><span class="tpl-mini-head">Starters</span>`+
   [1,2].map(()=>`<div class="tpl-mini-row"><i class="tpl-mini-img"></i><div class="tpl-mini-copy"><b></b><s></s></div><em>9.5</em></div>`).join('')+
@@ -2744,6 +2753,7 @@ app.addEventListener('click',e=>{
   if(a==='pause-promotion'){ pausePromotion(btn.dataset.kind||'item',btn.dataset.id); return; }
   if(a==='resume-promotion'){ resumePromotion(btn.dataset.kind||'item',btn.dataset.id); return; }
   if(a==='promo-segment'){ ui.promoSegment=btn.dataset.segment; render(); return; }
+  if(a==='promo-help'){ ui.promoHelp=!ui.promoHelp; render(); return; }
   if(a==='promo-temp'){ ui.sheetData.temp={...(ui.sheetData.temp||{}),[btn.dataset.key]:btn.dataset.value}; ui.sheetData.error=null; render(); return; }
   if(a==='promo-day'){ const temp={...(ui.sheetData.temp||{})}; const day=Number(btn.dataset.day); const days=Array.isArray(temp.days)?temp.days.map(Number):[0,1,2,3,4,5,6];
    temp.days=days.includes(day)?days.filter(d=>d!==day):[...days,day].sort((x,y)=>x-y);
