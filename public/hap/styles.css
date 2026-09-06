@@ -775,17 +775,13 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .promo-style-editorial .product-status{border-radius:0}
 
 /* --- category band --- */
-.menu-category.is-featured{margin-top:18px;padding:14px 12px 16px;border-radius:20px;background:color-mix(in srgb,var(--menu-brand) 8%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--menu-brand) 18%,transparent)}
-.menu-category.is-featured .menu-category-head h2{color:var(--menu-brand)}
-.menu-category .category-kicker{display:inline-block;margin-bottom:6px;color:var(--menu-brand);font-size:8.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
-.menu-category.is-featured.tint-sage{background:color-mix(in srgb,#627b4a 11%,transparent)}
-.menu-category.is-featured.tint-sage .menu-category-head h2,.menu-category.is-featured.tint-sage .category-kicker{color:#4f6a3a}
-.menu-category.is-featured.tint-sand{background:color-mix(in srgb,#c79a55 13%,transparent)}
-.menu-category.is-featured.tint-sand .menu-category-head h2,.menu-category.is-featured.tint-sand .category-kicker{color:#8d6720}
-.menu-category.is-featured.tint-clay{background:color-mix(in srgb,#a54c42 11%,transparent)}
-.menu-category.is-featured.tint-clay .menu-category-head h2,.menu-category.is-featured.tint-clay .category-kicker{color:#9c463c}
-.menu-category.is-featured.tint-night{background:color-mix(in srgb,var(--menu-text) 8%,transparent)}
-.menu-category.is-featured.tint-night .menu-category-head h2,.menu-category.is-featured.tint-night .category-kicker{color:var(--menu-text)}
+.menu-category.is-featured{margin-top:18px;padding:14px 12px 16px;border-radius:20px;background:color-mix(in srgb,var(--menu-brand) 7%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--menu-brand) 16%,transparent)}
+.menu-category.is-featured .menu-category-head h2{color:var(--menu-text)}
+.menu-category .category-kicker{display:inline-block;margin-bottom:6px;color:var(--menu-muted);font-size:8.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+.menu-category.is-featured.tint-sage{background:color-mix(in srgb,#627b4a 9%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,#627b4a 16%,transparent)}
+.menu-category.is-featured.tint-sand{background:color-mix(in srgb,#c79a55 10%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,#c79a55 18%,transparent)}
+.menu-category.is-featured.tint-clay{background:color-mix(in srgb,#a54c42 8%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,#a54c42 16%,transparent)}
+.menu-category.is-featured.tint-night{background:color-mix(in srgb,var(--menu-text) 7%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--menu-text) 12%,transparent)}
 .category-chip.is-featured{border-color:var(--menu-brand);color:var(--menu-brand);box-shadow:0 0 0 2px color-mix(in srgb,var(--menu-brand) 16%,transparent)}
 .category-chip.active.is-featured{background:var(--menu-brand);color:#fff}
 
@@ -904,7 +900,7 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 /* 1 · Category headers share one vertical rhythm across every template. */
 .menu-category-head{display:flex;align-items:flex-end;min-height:66px;padding:0 0 10px;margin:0 0 14px;width:100%}
 .category-head-inner{display:flex;flex-direction:column;gap:5px;width:100%;min-width:0}
-.category-head-inner .category-kicker{align-self:center}
+.category-head-inner .category-kicker{align-self:stretch}
 .category-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%}
 .category-head-row .category-count{flex:none;white-space:nowrap}
 .menu-category-head h2{margin:0}
@@ -913,14 +909,20 @@ button.signal-row>svg:last-child{color:var(--subtle);flex:none}
 .template-noir .menu-category-head,.template-modern .menu-category-head,.template-grid .menu-category-head,.template-street .menu-category-head{border-bottom:0}
 .menu-category{padding-top:20px}
 
-/* 2 · Featured category panel — one definition, three surfaces. */
+/* 2 · Featured category panel — editorial contrast: hairline-flanked kicker,
+   ink title, hairline under the title row. One definition, three surfaces. */
 .menu-category.is-featured{margin-top:20px;padding:16px 14px 18px;border-radius:20px;text-align:center;overflow:hidden}
-.menu-category.is-featured .menu-category-head{min-height:0;padding-bottom:12px;margin-bottom:14px}
-.menu-category .category-kicker{display:inline-flex;align-items:center;margin:0;padding:4px 11px;border-radius:999px;background:color-mix(in srgb,var(--menu-brand) 14%,transparent);color:var(--menu-brand);font-size:8.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;line-height:1.4}
-.menu-category.is-featured.tint-sage .category-kicker{background:color-mix(in srgb,#4f6a3a 16%,transparent)}
-.menu-category.is-featured.tint-sand .category-kicker{background:color-mix(in srgb,#8d6720 16%,transparent)}
-.menu-category.is-featured.tint-clay .category-kicker{background:color-mix(in srgb,#9c463c 16%,transparent)}
-.menu-category.is-featured.tint-night .category-kicker{background:color-mix(in srgb,var(--menu-text) 12%,transparent)}
+.menu-category.is-featured .menu-category-head{min-height:0;padding-bottom:0;margin-bottom:14px;text-align:left}
+.menu-category .category-kicker{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 2px;padding:0;color:var(--menu-muted);font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;line-height:1.4}
+.menu-category .category-kicker:before,.menu-category .category-kicker:after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--menu-brand) 30%,transparent)}
+.menu-category.is-featured .category-head-row{border-bottom:1px solid color-mix(in srgb,var(--menu-text) 13%,transparent);padding-bottom:12px}
+.menu-category.is-featured .menu-category-head h2{color:var(--menu-text)}
+.menu-category.is-featured.tint-sage .category-kicker:before,.menu-category.is-featured.tint-sage .category-kicker:after{background:color-mix(in srgb,#4f6a3a 32%,transparent)}
+.menu-category.is-featured.tint-sand .category-kicker:before,.menu-category.is-featured.tint-sand .category-kicker:after{background:color-mix(in srgb,#8d6720 32%,transparent)}
+.menu-category.is-featured.tint-clay .category-kicker:before,.menu-category.is-featured.tint-clay .category-kicker:after{background:color-mix(in srgb,#9c463c 32%,transparent)}
+.menu-category.is-featured.tint-night .category-kicker:before,.menu-category.is-featured.tint-night .category-kicker:after{background:color-mix(in srgb,var(--menu-text) 22%,transparent)}
+.template-street .menu-category.is-featured .menu-category-head h2{color:var(--menu-bg)}
+.template-modern .menu-category.is-featured .menu-category-head h2,.template-grid .menu-category.is-featured .menu-category-head h2{font-size:24px}
 .promo-preview .menu-category.is-featured{margin-top:0}
 
 /* 3 · The offer strip meets the card border exactly. */
