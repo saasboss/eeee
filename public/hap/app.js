@@ -330,7 +330,9 @@ const UI_STRINGS = {
   bannerImage:'Banner image', openingHours:'Opening hours',
   dietary:'Dietary', allergenGuide:'Allergen guide',
   allergenGuideSub:'The 14 allergens restaurants must declare.',
-  filtersSub:'Narrow the menu, or read the allergen key.',
+  filtersSub:'Choose what to show, or hide dishes with an allergen.',
+  avoidAllergen:'Avoid an allergen', matchCount:'{n} dishes match', matchCountOne:'1 dish matches',
+  matchNone:'No dishes match — try removing a filter.', clearAll:'Clear all', applyFilters:'Apply',
   allergyNote:'Always tell staff about a severe allergy — kitchens share equipment.',
   noAllergens:'No declared allergens.',
   displayCurrency:'Display currency', displayCurrencySub:'Approximate conversions set by the restaurant.',
@@ -352,7 +354,9 @@ const UI_STRINGS = {
   bannerImage:'Foto ballore', openingHours:'Orari i hapjes',
   dietary:'Dieta', allergenGuide:'Udhëzues alergenësh',
   allergenGuideSub:'14 alergenët që restorantet duhet t’i deklarojnë.',
-  filtersSub:'Ngushto menunë ose lexo listën e alergeneve.',
+  filtersSub:'Zgjidh çfarë të shfaqet ose fshih pjatat me alergen.',
+  avoidAllergen:'Shmang një alergen', matchCount:'{n} pjata përputhen', matchCountOne:'1 pjatë përputhet',
+  matchNone:'Asnjë pjatë — hiq një filtër.', clearAll:'Pastro të gjitha', applyFilters:'Apliko',
   allergyNote:'Njoftoni gjithmonë stafin për një alergji të rëndë — kuzhinat ndajnë të njëjtat pajisje.',
   noAllergens:'Asnjë alergen i deklaruar.',
   displayCurrency:'Monedha e shfaqur', displayCurrencySub:'Konvertime të përafërta të vendosura nga restoranti.',
@@ -374,7 +378,9 @@ const UI_STRINGS = {
   bannerImage:'Immagine di copertina', openingHours:'Orari di apertura',
   dietary:'Alimentazione', allergenGuide:'Guida agli allergeni',
   allergenGuideSub:'I 14 allergeni che i ristoranti devono dichiarare.',
-  filtersSub:'Restringi il menu o consulta la guida agli allergeni.',
+  filtersSub:'Scegli cosa mostrare o nascondi i piatti con un allergene.',
+  avoidAllergen:'Evita un allergene', matchCount:'{n} piatti corrispondono', matchCountOne:'1 piatto corrisponde',
+  matchNone:'Nessun piatto — prova a togliere un filtro.', clearAll:'Cancella tutto', applyFilters:'Applica',
   allergyNote:'Segnala sempre al personale un’allergia grave — le cucine condividono le attrezzature.',
   noAllergens:'Nessun allergene dichiarato.',
   displayCurrency:'Valuta visualizzata', displayCurrencySub:'Conversioni approssimative impostate dal ristorante.',
@@ -396,7 +402,9 @@ const UI_STRINGS = {
   bannerImage:'Εικόνα εξωφύλλου', openingHours:'Ώρες λειτουργίας',
   dietary:'Διατροφή', allergenGuide:'Οδηγός αλλεργιογόνων',
   allergenGuideSub:'Τα 14 αλλεργιογόνα που πρέπει να δηλώνονται.',
-  filtersSub:'Περιορίστε το μενού ή δείτε τα αλλεργιογόνα.',
+  filtersSub:'Επιλέξτε τι εμφανίζεται ή κρύψτε πιάτα με αλλεργιογόνο.',
+  avoidAllergen:'Αποφυγή αλλεργιογόνου', matchCount:'{n} πιάτα ταιριάζουν', matchCountOne:'1 πιάτο ταιριάζει',
+  matchNone:'Κανένα πιάτο — αφαιρέστε ένα φίλτρο.', clearAll:'Καθαρισμός', applyFilters:'Εφαρμογή',
   allergyNote:'Ενημερώνετε πάντα το προσωπικό για σοβαρή αλλεργία — οι κουζίνες μοιράζονται εξοπλισμό.',
   noAllergens:'Δεν δηλώνονται αλλεργιογόνα.',
   displayCurrency:'Νόμισμα εμφάνισης', displayCurrencySub:'Κατά προσέγγιση μετατροπές του εστιατορίου.',
@@ -1085,7 +1093,7 @@ function normalizeAppearance(a){
  return a;
 }
 
-let ui={sheet:null,sheetData:null,modal:null,expandedCategory:'popular',menuSearch:'',superSearch:'',languageSearch:'',editingItem:null,adminSearch:'',menuFilter:'all',superFilter:'all',userFilter:'all',subId:null,userSearch:'',confirm:null,skeleton:false,lastFocus:null,hoursOpen:false,dietFilter:'all',displayCurrency:null,transLang:null,
+let ui={sheet:null,sheetData:null,modal:null,expandedCategory:'popular',menuSearch:'',superSearch:'',languageSearch:'',editingItem:null,adminSearch:'',menuFilter:'all',superFilter:'all',userFilter:'all',subId:null,userSearch:'',confirm:null,skeleton:false,lastFocus:null,hoursOpen:false,dietFilters:[],avoidAllergens:[],filterDraft:null,displayCurrency:null,transLang:null,
  /* Menu workspace */
  menuCategory:'all', menuSelect:null, menuReorder:false, menuPreview:false, menuError:false, menuLoading:false, menuDirty:false, menuMore:false, promoHelp:false, settingsDirty:false, settingsDraft:null, itemDraft:null};
 
@@ -2167,14 +2175,32 @@ function renderPreview(){
    <div class="restaurant-line"><div class="public-avatar">${r.avatar?`<img src="${escapeHtml(r.avatar)}" alt="${escapeHtml(r.name)} logo">`:`<span class="avatar-placeholder">${icon('image',20)}</span>`}</div><div class="restaurant-copy"><h1>${escapeHtml(r.name)}</h1><div class="restaurant-meta"><span class="open-chip"><i></i>${escapeHtml(r.status)}</span>${hoursDisclosure()}</div></div></div>
    <label class="public-search">${icon('search',17)}<input id="public-search-input" value="${escapeHtml(ui.menuSearch)}" placeholder="${escapeHtml(t('search'))}" autocomplete="off"></label></header>
    ${p&&p.item.promotion.intensity==='strong'&&!state.preview.strongDismissed?`<button class="strong-promo-card reveal-item" data-action="scroll-item" data-id="${p.item.id}"><img src="${absoluteAsset(p.item.image)}" alt="${escapeHtml(tItem(p.item).name)}"><div><b>${escapeHtml(p.item.promotion.label)}</b><strong>${escapeHtml(tItem(p.item).name)}</strong><span>${escapeHtml(tItem(p.item).ingredients)}</span></div>${icon('chevron',18)}</button>`:''}
-   <div class="category-sticky" id="category-sticky"><div class="menu-toolbar"><nav class="category-strip" id="category-strip">${visibleCategories().map((c,idx)=>`<button class="category-chip ${idx===0?'active':''} ${isPromotedCategory(c)?'is-featured':''}" data-action="jump-category" data-id="${c.id}">${escapeHtml(tCategory(c))}</button>`).join('')}</nav><div class="toolbar-actions">${languageToggle()}${currencyToggle()}<button class="filter-btn ${(ui.dietFilter||'all')!=='all'?'active':''}" data-action="filters-sheet" aria-label="${escapeHtml(t('filtersAria'))}">${icon('menu',13)}<span>${escapeHtml(t('filters'))}</span></button></div></div></div>
+   <div class="category-sticky" id="category-sticky"><div class="menu-toolbar"><nav class="category-strip" id="category-strip">${visibleCategories().map((c,idx)=>`<button class="category-chip ${idx===0?'active':''} ${isPromotedCategory(c)?'is-featured':''}" data-action="jump-category" data-id="${c.id}">${escapeHtml(tCategory(c))}</button>`).join('')}</nav><div class="toolbar-actions">${languageToggle()}${currencyToggle()}<button class="filter-btn ${activeFilterCount()?'active':''}" data-action="filters-sheet" aria-label="${escapeHtml(t('filtersAria'))}">${icon('menu',13)}<span>${escapeHtml(t('filters'))}${activeFilterCount()?` <b>${activeFilterCount()}</b>`:''}</span></button></div></div></div>
    <main class="menu-sections">${visibleCategories().length?visibleCategories().map((c,ci)=>renderPublicCategory(c,ci)).join(''):`<div class="card empty" style="margin:16px">${escapeHtml(state.categories.length?t('noMatch'):t('emptyMenu'))}</div>`}</main>
   </div></div>`;
 }
+/* A dish passes when it carries every selected diet tag and none of the
+   allergens the guest asked to avoid. */
+function activeDiets(){ return Array.isArray(ui.dietFilters)?ui.dietFilters:[]; }
+function activeAvoid(){ return Array.isArray(ui.avoidAllergens)?ui.avoidAllergens:[]; }
+function activeFilterCount(){ return activeDiets().length+activeAvoid().length; }
 function dietMatches(i){
- const f=ui.dietFilter||'all';
- if(f==='all') return true;
- return itemDiets(i).includes(f);
+ const diets=activeDiets(), avoid=activeAvoid();
+ if(!diets.length&&!avoid.length) return true;
+ const has=itemDiets(i), al=itemAllergens(i);
+ return diets.every(d=>has.includes(d)) && !avoid.some(c=>al.includes(c));
+}
+function filterDraft(){
+ if(!ui.filterDraft) ui.filterDraft={diets:activeDiets().slice(),avoid:activeAvoid().slice()};
+ return ui.filterDraft;
+}
+/* Counts against the draft without disturbing what the menu currently shows. */
+function draftMatchCount(){
+ const d=filterDraft();
+ const keep=i=>i.status!=='hidden'&&(!state.hideSoldOut||i.status!=='soldout')
+  &&d.diets.every(x=>itemDiets(i).includes(x))
+  &&!d.avoid.some(c=>itemAllergens(i).includes(c));
+ return state.categories.reduce((n,c)=>n+c.items.filter(keep).length,0);
 }
 function visibleItemsOf(c){ return c.items.filter(i=>i.status!=='hidden'&&(!state.hideSoldOut||i.status!=='soldout')&&dietMatches(i)); }
 function visibleCategories(){ return state.categories.filter(c=>visibleItemsOf(c).length); }
@@ -2348,13 +2374,18 @@ function allergenSheet(){
 }
 const SPICE_LABELS=['Not spicy','Mild','Spicy','Very spicy'];
 function filtersSheet(){
- const active=ui.dietFilter||'all';
+ const d=filterDraft();
+ const n=draftMatchCount();
+ const count=n===0?t('matchNone'):(n===1?t('matchCountOne'):t('matchCount',{n}));
  return sheetShell(escapeHtml(t('filters')),escapeHtml(t('filtersSub')),
   `<div class="sheet-label">${escapeHtml(t('dietary'))}</div>
-  <div class="diet-row sheet-diets">${DIET_FILTERS.map(([id,name])=>`<button class="filter-chip ${active===id?'active':''}" data-action="diet-filter" data-diet="${id}">${escapeHtml(id==='all'?t('all'):dietLabel(id))}</button>`).join('')}</div>
+  <div class="diet-row sheet-diets">${DIETS.map(([id])=>`<button class="filter-chip ${d.diets.includes(id)?'active':''}" data-action="diet-toggle" data-diet="${id}" aria-pressed="${d.diets.includes(id)?'true':'false'}">${escapeHtml(dietLabel(id))}</button>`).join('')}</div>
+  <div class="sheet-label" style="margin-top:16px">${escapeHtml(t('avoidAllergen'))}</div>
+  <div class="diet-row sheet-diets">${ALLERGENS.map(([code])=>`<button class="filter-chip avoid ${d.avoid.includes(code)?'active':''}" data-action="allergen-toggle" data-code="${code}" aria-pressed="${d.avoid.includes(code)?'true':'false'}">${escapeHtml(allergenLabel(code))}</button>`).join('')}</div>
   <div class="sheet-label" style="margin-top:16px">${escapeHtml(t('allergenGuide'))}</div>
-  <div class="allergen-grid">${ALLERGENS.map(([code,full,short])=>`<div class="allergen-cell"><strong>${escapeHtml(short)}</strong>${full.toLowerCase().startsWith(short.toLowerCase())?'':`<span>${escapeHtml(full)}</span>`}</div>`).join('')}</div>
-  <p class="fx-note">${escapeHtml(t('allergyNote'))}</p>`);
+  <div class="allergen-grid">${ALLERGENS.map(([code])=>{const full=allergenFull(code),short=allergenLabel(code);return `<div class="allergen-cell"><strong>${escapeHtml(short)}</strong>${full.toLowerCase().startsWith(short.toLowerCase())?'':`<span>${escapeHtml(full)}</span>`}</div>`;}).join('')}</div>
+  <p class="fx-note">${escapeHtml(t('allergyNote'))}</p>
+  <div class="filters-actions"><span class="filters-count ${n?'':'none'}" aria-live="polite">${escapeHtml(count)}</span><button class="btn ghost" data-action="filters-clear">${escapeHtml(t('clearAll'))}</button><button class="btn primary" data-action="filters-apply">${escapeHtml(t('applyFilters'))}</button></div>`);
 }
 function itemDetailsSheet(){
  const f=getItem((ui.sheetData||{}).id);
@@ -2900,9 +2931,12 @@ app.addEventListener('click',e=>{
  if(a==='insights-range'){ ui.insightsRange=btn.dataset.range; render(); return; }
  if(a==='seed-analytics'){ seedAnalytics(); return; }
  if(a==='clear-analytics'){ showConfirm({title:'Clear guest analytics?',body:'Every recorded visit and demo event is deleted. Reporting starts from empty.',label:'Clear analytics',tone:'danger',run(){ Services.insights.clear(); toast('Analytics cleared'); render(); }}); return; }
- if(a==='diet-filter'){ ui.dietFilter=btn.dataset.diet; if(btn.dataset.diet&&btn.dataset.diet!=='all') track('filter_diet',{diet:btn.dataset.diet}); render(); return; }
+ if(a==='diet-toggle'||a==='diet-filter'){ const id=btn.dataset.diet; const d=filterDraft(); if(!id||id==='all'){ d.diets=[]; } else if(d.diets.includes(id)) d.diets=d.diets.filter(x=>x!==id); else { d.diets.push(id); track('filter_diet',{diet:id}); } render(); return; }
+ if(a==='allergen-toggle'){ const code=btn.dataset.code; const d=filterDraft(); if(d.avoid.includes(code)) d.avoid=d.avoid.filter(x=>x!==code); else { d.avoid.push(code); track('filter_allergen',{code}); } render(); return; }
+ if(a==='filters-clear'){ ui.filterDraft={diets:[],avoid:[]}; render(); return; }
+ if(a==='filters-apply'){ const d=filterDraft(); ui.dietFilters=d.diets.slice(); ui.avoidAllergens=d.avoid.slice(); ui.filterDraft=null; ui.sheet=null; render(); return; }
  if(a==='allergen-sheet'){ ui.sheet='allergens'; track('filter_allergen',{code:btn.dataset.code||'guide'}); render(); return; }
- if(a==='filters-sheet'){ ui.sheet='filters'; render(); return; }
+ if(a==='filters-sheet'){ ui.filterDraft=null; ui.sheet='filters'; render(); return; }
  if(a==='item-details'){ ui.sheet='itemDetails'; ui.sheetData={id:btn.dataset.id}; render(); return; }
  if(a==='display-currency'){ ui.sheet='displayCurrency'; render(); return; }
  if(a==='set-display-currency'){ ui.displayCurrency=btn.dataset.code; ui.sheet=null; render(); return; }
